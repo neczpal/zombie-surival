@@ -54,6 +54,9 @@ var map_height = 50;
 var tick = 10;
 var timer;
 
+var anim_index = 0;
+var animation_rate = 2;
+
 var score;
 var highscore = -1;
 
@@ -87,19 +90,62 @@ var info1;
 var info2;
 var info3;
 
+//Images
+
 const crateImage = new Image(256, 256);
 crateImage.src = './res/crate.png';
 
+const floorImage = new Image(345, 345);
+floorImage.src = './res/floor.jpg';
+
 const bulletRightImage = new Image(128, 128);
-bulletRightImage.src = './res/bullet_right.png';
+    bulletRightImage.src = './res/bullet_right.png';
 const bulletTopImage = new Image(128, 128);
-bulletTopImage.src = './res/bullet_top.png';
+    bulletTopImage.src = './res/bullet_top.png';
 const bulletLeftImage = new Image(128, 128);
-bulletLeftImage.src = './res/bullet_left.png';
+    bulletLeftImage.src = './res/bullet_left.png';
 const bulletBotImage = new Image(128, 128);
-bulletBotImage.src = './res/bullet_bot.png';
+    bulletBotImage.src = './res/bullet_bot.png';
 
 const bulletImages = [bulletTopImage, bulletRightImage, bulletBotImage, bulletLeftImage];
+
+const zombieRightImage1 = new Image(74, 74);
+zombieRightImage1.src = './res/zombie_right_1.png';
+const zombieRightImage2 = new Image(74, 74);
+zombieRightImage2.src = './res/zombie_right_2.png';
+const zombieRightImage3 = new Image(74, 74);
+zombieRightImage3.src = './res/zombie_right_3.png';
+
+const zombieRightImages = [zombieRightImage1, zombieRightImage2, zombieRightImage3];
+
+const zombieLeftImage1 = new Image(74, 74);
+zombieLeftImage1.src = './res/zombie_left_1.png';
+const zombieLeftImage2 = new Image(74, 74);
+zombieLeftImage2.src = './res/zombie_left_2.png';
+const zombieLeftImage3 = new Image(74, 74);
+zombieLeftImage3.src = './res/zombie_left_3.png';
+
+const zombieLeftImages = [zombieLeftImage1, zombieLeftImage2, zombieLeftImage3];
+
+const zombieTopImage1 = new Image(74, 74);
+zombieTopImage1.src = './res/zombie_top_1.png';
+const zombieTopImage2 = new Image(74, 74);
+zombieTopImage2.src = './res/zombie_top_2.png';
+const zombieTopImage3 = new Image(74, 74);
+zombieTopImage3.src = './res/zombie_top_3.png';
+
+const zombieTopImages = [zombieTopImage1, zombieTopImage2, zombieTopImage3];
+
+const zombieBotImage1 = new Image(74, 74);
+zombieBotImage1.src = './res/zombie_bot_1.png';
+const zombieBotImage2 = new Image(74, 74);
+zombieBotImage2.src = './res/zombie_bot_2.png';
+const zombieBotImage3 = new Image(74, 74);
+zombieBotImage3.src = './res/zombie_bot_3.png';
+
+const zombieBotImages = [zombieBotImage1, zombieBotImage2, zombieBotImage3];
+
+const zombieImages = [zombieTopImages, zombieRightImages, zombieBotImages, zombieLeftImages];
 
 function Point(x, y){
     this.x = x;
@@ -183,7 +229,7 @@ function Map(w, h){
         return x >= 0 && y >= 0 && x < this.width && y < this.height && this.tiles[x][y] == 0;
     };
     this.draw = function(x, y){
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = "#42240c";
         ctx.fillRect(0, 0, view_width, view_height);
 
         for (var i = 0; i < this.width; i++){
@@ -193,6 +239,8 @@ function Map(w, h){
                     ctx.drawImage(crateImage, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
                     // ctx.fillStyle = "#FFFFFF";
                     // ctx.fillRect(tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
+                } else {
+                    ctx.drawImage(floorImage, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
                 }
             }
         }
@@ -289,11 +337,13 @@ function Player(kx, ky){
     };
 
     this.draw = function(mx, my){
-        ctx.fillStyle = "#00FF00";
-        ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
+        // ctx.fillStyle = "#00FF00";
+        // ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
         // ctx.fillStyle = "#00FFFF";
         // ctx.fillRect(tiles_pos_x[this.fx] - mx, tiles_pos_y[this.fy] - my, tile_size, tile_size);
         // ctx.drawImage(arrows[this.direction], this.x - mx, this.y - my, tile_size, tile_size);
+
+        ctx.drawImage(zombieImages[this.direction][this.walking ? anim_index : 1], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
 function Mob(kx, ky, l){
@@ -364,8 +414,9 @@ function Mob(kx, ky, l){
     };
 
     this.draw = function(mx, my){
-        ctx.fillStyle = "#FF0000";
-        ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
+        // ctx.fillStyle = "#FF0000";
+        ctx.drawImage(zombieImages[this.direction][anim_index], this.x - mx, this.y - my, tile_size, tile_size);
+        // ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
 function Bullet(x, y, kx, ky, direction){
@@ -1031,6 +1082,9 @@ function runGame(){
 
         next_trouble = Math.floor(Math.random()*trouble_def.length);
     }
+    if (timer % animation_rate == 0) {
+        anim_index = (anim_index + 1) % 3
+    }
 
     var move = false;
     if(reverse_active){
@@ -1144,7 +1198,7 @@ function drawGame(){
         drawMainGame();
     }
 
-    ctx.fillStyle = "#00FFFF";
+    ctx.fillStyle = "#f0ece3";
     ctx.font = "34px Georgia";
     ctx.fillText(info1, 50, 50);
     ctx.fillText(info2, 400, 50);
