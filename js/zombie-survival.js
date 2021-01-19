@@ -24,8 +24,8 @@ var stink_dist;
 var trouble_rate = 250;
 var current_trouble;
 var next_trouble;
-// var zoom_size = 2;
-//var zoom_duration = 5;
+var zoom_size = 2;
+var zoom_duration = 5;
 var explosion_size = 2;
 var slow_scale = 8;
 var slow_duration = 7;
@@ -86,6 +86,20 @@ var arrows;
 var info1;
 var info2;
 var info3;
+
+const crateImage = new Image(256, 256);
+crateImage.src = './res/crate.png';
+
+const bulletRightImage = new Image(128, 128);
+bulletRightImage.src = './res/bullet_right.png';
+const bulletTopImage = new Image(128, 128);
+bulletTopImage.src = './res/bullet_top.png';
+const bulletLeftImage = new Image(128, 128);
+bulletLeftImage.src = './res/bullet_left.png';
+const bulletBotImage = new Image(128, 128);
+bulletBotImage.src = './res/bullet_bot.png';
+
+const bulletImages = [bulletTopImage, bulletRightImage, bulletBotImage, bulletLeftImage];
 
 function Point(x, y){
     this.x = x;
@@ -176,8 +190,9 @@ function Map(w, h){
             for (var j = 0; j < this.height; j++)
             {
                 if(this.tiles[i][j] == 1){
-                    ctx.fillStyle = "#FFFFFF";
-                    ctx.fillRect(tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
+                    ctx.drawImage(crateImage, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
+                    // ctx.fillStyle = "#FFFFFF";
+                    // ctx.fillRect(tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
                 }
             }
         }
@@ -417,9 +432,7 @@ function Bullet(x, y, kx, ky, direction){
     };
 
     this.draw = function(mx, my){
-        ctx.fillStyle = "#0000FF";
-        ctx.fillRect(this.x - mx, this.y - my, bullet_size, bullet_size);
-        //ctx.drawImage(arrows[this.direction], this.x - mx, this.y - my, tile_size, tile_size);
+        ctx.drawImage(bulletImages[direction], this.x - mx, this.y - my, bullet_size, bullet_size);
     };
 }
 function Trouble(name, duration, use, unuse){
@@ -428,38 +441,38 @@ function Trouble(name, duration, use, unuse){
     this.use = use;
     this.unuse = unuse;
 }
-/*	        function set_meret(meret){
+// function set_meret(meret){
+//
+//     tile_size = meret;
+//     bullet_size = meret/4;
+//     player_velocity = meret/4;
+//     bullet_velocity = meret/2;
+//     mob_velocity = meret/4;
+//
+//     corigate_x = view_width / 2 - tile_size/2;
+//     corigate_y = view_height / 2 - tile_size/2;
+//
+//     tiles_pos_x = [];
+//     for(var i=0; i < map_width; i++){
+//         tiles_pos_x[i] = i * tile_size;
+//     }
+//
+//     tiles_pos_y = [];
+//     for(var j=0; j < map_height; j++){
+//         tiles_pos_y[j] = j * tile_size;
+//     }
+//     corigate_bullet = tile_size/2 - bullet_size/2;
+// }
+// function corrigate(meret){
+//     p_player.resize(meret);
+//     for(var i=0; i < mobs.length; i++){
+//         mobs[i].resize(meret);
+//     }
+//     for(var i=0; i < bullets.length; i++){
+//         bullets[i].resize(meret);
+//     }
+// }
 
-	        	tile_size = meret;
-	        	bullet_size = meret/4;
-	        	player_velocity = meret/4;
-	        	bullet_velocity = meret/2;
-	        	mob_velocity = meret/4;
-
-	        	corigate_x = view_width / 2 - tile_size/2;
-				corigate_y = view_height / 2 - tile_size/2;
-
-				tiles_pos_x = [];
-	            for(var i=0; i < map_width; i++){
-	            	tiles_pos_x[i] = i * tile_size;
-	            }
-
-	            tiles_pos_y = [];
-	            for(var j=0; j < map_height; j++){
-	            	tiles_pos_y[j] = j * tile_size;
-	            }
-	            corigate_bullet = tile_size/2 - bullet_size/2;
-	        }
-			function corrigate(meret){
-	        	p_player.resize(meret);
-	        	for(var i=0; i < mobs.length; i++){
-	        		mobs[i].resize(meret);
-	        	}
-	        	for(var i=0; i < bullets.length; i++){
-	        		bullets[i].resize(meret);
-	        	}
-	        }
-*/
 function newgame(){
     lose = false;
 
@@ -917,10 +930,6 @@ function doKeyUp(event){
     }
 }
 
-//predefined szivatasok
-/*1. szivatások
-        -csak néha látás
-*/
 trouble_def = [];
 trouble_def[0] = new Trouble("Explosion", -1, function(){
     var tolx = Math.max(p_player.getFx() - explosion_size, 0);
@@ -939,14 +948,7 @@ trouble_def[0] = new Trouble("Explosion", -1, function(){
 }, function(){
     //NO NEED
 });
-/*szivatas_def[1] = new Trouble("Shortview", zoom_duration, function(){
-    var ujmeret = base_size * zoom_nagysag;
-    corrigate(ujmeret);
-    set_meret(ujmeret);
-}, function(){
-    corrigate(base_size);
-    set_meret(base_size);
-});*/
+/**/
 trouble_def[1] = new Trouble("Broken leg", slow_duration, function(){
     player_velocity = tile_size / slow_scale;
 }, function(){
@@ -979,6 +981,15 @@ trouble_def[6] = new Trouble("Blackout", blackout_duration, function(){
 }, function(){
     blackout_active = false;
 });
+// #TODO Not working as intended
+// trouble_def[7] = new Trouble("Shortview", zoom_duration, function(){
+//     var ujmeret = base_size * zoom_size;
+//     corrigate(ujmeret);
+//     set_meret(ujmeret);
+// }, function(){
+//     corrigate(base_size);
+//     set_meret(base_size);
+// });
 function add_trouble(sz){
     //TODO KIIRJA HOGY MILYEN SZIVATAS
     sz.use();
