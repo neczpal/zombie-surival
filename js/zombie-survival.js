@@ -1,18 +1,3 @@
-/** DONE
- -bugfix: lövésnél és mob player ütközés
- */
-
-/** TODOK
- *
- 0. Mostani szivatásból hátra lévő idő
- 1. game end, main menu stb stb.
- 2. mob mozgás fejlesztése butább több level stb.
- 3. képek!!
- 4. effektek
- 5. rekkord
-
- */
-
 var c, ctx;
 
 var butsize = 50;
@@ -33,7 +18,7 @@ var spawn_rate;
 
 var mobskill;//#TODO
 var mobszaglas;//#TODO
-var szagokd;
+var stinkd;
 var stink_dist;
 
 var trouble_rate = 250;
@@ -216,7 +201,7 @@ function Player(kx, ky){
     this.fx = Math.floor((this.x + tile_size/2) / tile_size);
     this.fy = Math.floor((this.y + tile_size/2) / tile_size);
 
-    this.irany = 0;
+    this.direction = 0;
 
     this.resize = function(ujmeret){
         this.x = this.x / tile_size * ujmeret;
@@ -225,7 +210,7 @@ function Player(kx, ky){
         this.y2 = this.y + ujmeret;
     };
 
-    this.megy = function(vx, vy){
+    this.move = function(vx, vy){
         this.walking = true;
         this.x = this.x + vx;
         this.y = this.y + vy;
@@ -244,7 +229,7 @@ function Player(kx, ky){
             //setTimeout(function(){ buzles(new Point(tempx, tempy));}, 0);
         }
     };
-    this.megall = function(){
+    this.stop = function(){
         this.walking = false;
     };
 
@@ -281,11 +266,11 @@ function Player(kx, ky){
     this.getY2 = function(){
         return this.y2;
     };
-    this.getIrany = function(){
-        return this.irany;
+    this.getDirection = function(){
+        return this.direction;
     };
-    this.setIrany = function(ir){
-        this.irany = ir;
+    this.setDirection = function(ir){
+        this.direction = ir;
     };
 
     this.draw = function(mx, my){
@@ -293,7 +278,7 @@ function Player(kx, ky){
         ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
         // ctx.fillStyle = "#00FFFF";
         // ctx.fillRect(tiles_pos_x[this.fx] - mx, tiles_pos_y[this.fy] - my, tile_size, tile_size);
-        // ctx.drawImage(arrows[this.irany], this.x - mx, this.y - my, tile_size, tile_size);
+        // ctx.drawImage(arrows[this.direction], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
 function Mob(kx, ky, l){
@@ -305,7 +290,7 @@ function Mob(kx, ky, l){
     this.y2 = this.y + tile_size;
     this.level = l;
     this.v = mob_velocity;
-    this.irany = 0;
+    this.direction = 0;
 
     this.resize = function(ujmeret){
         this.x = this.x / tile_size * ujmeret;
@@ -314,7 +299,7 @@ function Mob(kx, ky, l){
         this.y2 = this.y + ujmeret;
     };
 
-    this.megy = function(vx, vy){
+    this.move = function(vx, vy){
         this.walking = true;
         this.x = this.x + vx;
         this.y = this.y + vy;
@@ -323,7 +308,7 @@ function Mob(kx, ky, l){
         this.kx = Math.floor(this.x / tile_size);
         this.ky = Math.floor(this.y / tile_size);
     };
-    this.megall = function(){
+    this.stop = function(){
         this.walking = false;
     };
 
@@ -350,11 +335,11 @@ function Mob(kx, ky, l){
     this.getY2 = function(){
         return this.y2;
     };
-    this.getIrany = function(){
-        return this.irany;
+    this.getDirection = function(){
+        return this.direction;
     };
-    this.setIrany = function(ir){
-        this.irany = ir;
+    this.setDirection = function(ir){
+        this.direction = ir;
     };
     this.getLevel = function(){
         return this.level;
@@ -368,7 +353,7 @@ function Mob(kx, ky, l){
         ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
-function Bullet(x, y, kx, ky, irany){
+function Bullet(x, y, kx, ky, direction){
     this.kx = kx;
     this.ky = ky;
     this.x = x + corigate_bullet;
@@ -377,7 +362,7 @@ function Bullet(x, y, kx, ky, irany){
     this.y2 = this.y + bullet_size;
     this.ox = this.x + tile_size/2;
     this.oy = this.y + tile_size/2;
-    this.irany = irany;
+    this.direction = direction;
 
     this.resize = function(ujmeret){
         this.x = this.x / tile_size * ujmeret;
@@ -386,9 +371,9 @@ function Bullet(x, y, kx, ky, irany){
         this.y2 = this.y + ujmeret;
     };
 
-    this.megy = function(){
-        this.x = this.x + directions[this.irany][0] * bullet_velocity;
-        this.y = this.y + directions[this.irany][1] * bullet_velocity;
+    this.move = function(){
+        this.x = this.x + directions[this.direction][0] * bullet_velocity;
+        this.y = this.y + directions[this.direction][1] * bullet_velocity;
         this.x2 = this.x + bullet_size;
         this.y2 = this.y + bullet_size;
         this.ox = this.x + tile_size/2;
@@ -424,20 +409,20 @@ function Bullet(x, y, kx, ky, irany){
     this.getY2 = function(){
         return this.y2;
     };
-    this.getIrany = function(){
-        return this.irany;
+    this.getDirection = function(){
+        return this.direction;
     };
-    this.setIrany = function(ir){
-        this.irany = ir;
+    this.setDirection = function(ir){
+        this.direction = ir;
     };
 
     this.draw = function(mx, my){
         ctx.fillStyle = "#0000FF";
         ctx.fillRect(this.x - mx, this.y - my, bullet_size, bullet_size);
-        //ctx.drawImage(arrows[this.irany], this.x - mx, this.y - my, tile_size, tile_size);
+        //ctx.drawImage(arrows[this.direction], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
-function Szivatas(name, duration, use, unuse){
+function Trouble(name, duration, use, unuse){
     this.name = name;
     this.duration = duration;
     this.use = use;
@@ -515,43 +500,43 @@ function newgame(){
     p_player = new Player(map_width/2, map_height/2);
 
     buzles(new Point(p_player.getFx(), p_player.getFy()));
-    next_trouble = Math.floor(Math.random()*szivatas_def.length);
+    next_trouble = Math.floor(Math.random()*trouble_def.length);
 }
 function resetSzagok(){
-    szagokd = [];
+    stinkd = [];
     for(var i=0; i < map_width; i++){
-        szagokd[i] = [];
+        stinkd[i] = [];
     }
 }
 function buzles(point){
     resetSzagok();
 
     var queue = [];
-    szagokd[point.x][point.y] = 0;
+    stinkd[point.x][point.y] = 0;
     queue.push(point);
     while(queue.length != 0){
         var c_point = queue.shift();
-        if(m.empty(c_point.x+1, c_point.y) && szagokd[c_point.x+1][c_point.y] == undefined){
-            szagokd[c_point.x+1][c_point.y] = szagokd[c_point.x][c_point.y] + 1;
-            if(szagokd[c_point.x+1][c_point.y] < stink_dist){
+        if(m.empty(c_point.x+1, c_point.y) && stinkd[c_point.x+1][c_point.y] == undefined){
+            stinkd[c_point.x+1][c_point.y] = stinkd[c_point.x][c_point.y] + 1;
+            if(stinkd[c_point.x+1][c_point.y] < stink_dist){
                 queue.push(new Point(c_point.x+1, c_point.y));
             }
         }
-        if(m.empty(c_point.x-1, c_point.y) && szagokd[c_point.x-1][c_point.y] == undefined){
-            szagokd[c_point.x-1][c_point.y] = szagokd[c_point.x][c_point.y] + 1;
-            if(szagokd[c_point.x-1][c_point.y] < stink_dist){
+        if(m.empty(c_point.x-1, c_point.y) && stinkd[c_point.x-1][c_point.y] == undefined){
+            stinkd[c_point.x-1][c_point.y] = stinkd[c_point.x][c_point.y] + 1;
+            if(stinkd[c_point.x-1][c_point.y] < stink_dist){
                 queue.push(new Point(c_point.x-1, c_point.y));
             }
         }
-        if(m.empty(c_point.x, c_point.y+1) && szagokd[c_point.x][c_point.y+1] == undefined){
-            szagokd[c_point.x][c_point.y+1] = szagokd[c_point.x][c_point.y] + 1;
-            if(szagokd[c_point.x][c_point.y+1] < stink_dist){
+        if(m.empty(c_point.x, c_point.y+1) && stinkd[c_point.x][c_point.y+1] == undefined){
+            stinkd[c_point.x][c_point.y+1] = stinkd[c_point.x][c_point.y] + 1;
+            if(stinkd[c_point.x][c_point.y+1] < stink_dist){
                 queue.push(new Point(c_point.x, c_point.y+1));
             }
         }
-        if(m.empty(c_point.x, c_point.y-1) && szagokd[c_point.x][c_point.y-1] == undefined){
-            szagokd[c_point.x][c_point.y-1] = szagokd[c_point.x][c_point.y] + 1;
-            if(szagokd[c_point.x][c_point.y-1] < stink_dist){
+        if(m.empty(c_point.x, c_point.y-1) && stinkd[c_point.x][c_point.y-1] == undefined){
+            stinkd[c_point.x][c_point.y-1] = stinkd[c_point.x][c_point.y] + 1;
+            if(stinkd[c_point.x][c_point.y-1] < stink_dist){
                 queue.push(new Point(c_point.x, c_point.y-1));
             }
         }
@@ -571,32 +556,32 @@ function utkozoMob(x, y){
     return -1;
 }
 function utkozoPlayer(m){
-    /*var bal_fent = m.isInside(p_player.getX(), p_player.getY());
-    var jobb_fent = m.isInside(p_player.getX2(), p_player.getY());
-    var jobb_lent = m.isInside(p_player.getX2(), p_player.getY2());
-    var bal_lent = m.isInside(p_player.getX(), p_player.getY2());
+    /*var left_top = m.isInside(p_player.getX(), p_player.getY());
+    var right_top = m.isInside(p_player.getX2(), p_player.getY());
+    var right_bot = m.isInside(p_player.getX2(), p_player.getY2());
+    var left_bot = m.isInside(p_player.getX(), p_player.getY2());
 
     if(p_player.getX() % tile_size == 0){
 
     }
-    var bal_jobb =
+    var left_right =
 
-    return (bal_fent && jobb_fent ||
-            jobb_fent && jobb_lent ||
-            jobb_lent && bal_lent ||
-            bal_lent && bal_fent);
+    return (left_top && right_top ||
+            right_top && right_bot ||
+            right_bot && left_bot ||
+            left_bot && left_top);
             */
     return m.isInside(p_player.getOx(), p_player.getOy());
 }
 
-function jobb(irany){
-    return (irany+1) % 4;
+function right(direction){
+    return (direction+1) % 4;
 }
-function bal(irany){
-    return (irany+3) % 4;
+function left(direction){
+    return (direction+3) % 4;
 }
-function fordul(irany){
-    return (irany+2) % 4;
+function fordul(direction){
+    return (direction+2) % 4;
 }
 
 function mob_level0(x, y){
@@ -612,63 +597,63 @@ function mob_level0(x, y){
 
     return opt[Math.floor(Math.random()*opt.length)];
 }
-function mob_level1(x, y, irany){
+function mob_level1(x, y, direction){
 
     var temp = Math.random();
     if(temp <= 0.75){
-        var ujx = x + directions[irany][0];
-        var ujy = y + directions[irany][1];
+        var ujx = x + directions[direction][0];
+        var ujy = y + directions[direction][1];
         if(m.empty(ujx, ujy)){
-            return irany;
+            return direction;
         }else{
             if(temp <= 0.3){
-                return mob_level1(x, y, jobb(irany));
+                return mob_level1(x, y, right(direction));
             }else
             if(temp <= 0.6){
-                return mob_level1(x, y, bal(irany));
+                return mob_level1(x, y, left(direction));
             }else{
-                return mob_level1(x, y, fordul(irany));
+                return mob_level1(x, y, fordul(direction));
             }
         }
     }else
     if(temp <= 0.85){
-        irany = bal(irany);
-        var ujx = x + directions[irany][0];
-        var ujy = y + directions[irany][1];
+        direction = left(direction);
+        var ujx = x + directions[direction][0];
+        var ujy = y + directions[direction][1];
         if(m.empty(ujx, ujy)){
-            return irany;
+            return direction;
         }else{
             if(temp <= 0.8){
-                return mob_level1(x, y, jobb(irany));
+                return mob_level1(x, y, right(direction));
             }else{//if(temp <= 0.85){
-                return mob_level1(x, y, bal(irany));
+                return mob_level1(x, y, left(direction));
             }
         }
     }else
     if(temp <= 0.95){
-        irany = jobb(irany);
-        var ujx = x + directions[irany][0];
-        var ujy = y + directions[irany][1];
+        direction = right(direction);
+        var ujx = x + directions[direction][0];
+        var ujy = y + directions[direction][1];
         if(m.empty(ujx, ujy)){
-            return irany;
+            return direction;
         }else{
             if(temp <= 0.9){
-                return mob_level1(x, y, jobb(irany));
+                return mob_level1(x, y, right(direction));
             }else{ //if(temp <= 0.95){
-                return mob_level1(x, y, bal(irany));
+                return mob_level1(x, y, left(direction));
             }
         }
     }else{
-        irany = fordul(irany);
-        var ujx = x + directions[irany][0];
-        var ujy = y + directions[irany][1];
+        direction = fordul(direction);
+        var ujx = x + directions[direction][0];
+        var ujy = y + directions[direction][1];
         if(m.empty(ujx, ujy)){
-            return irany;
+            return direction;
         }else{
             if(temp <= 0.975){
-                return mob_level1(x, y, jobb(irany));
+                return mob_level1(x, y, right(direction));
             }else{//if(temp <= 1.0){
-                return mob_level1(x, y, bal(irany));
+                return mob_level1(x, y, left(direction));
             }
         }
     }
@@ -676,9 +661,9 @@ function mob_level1(x, y, irany){
 function mob_level2(x, y){
     var options = [];
     for(var i=0; i < 4; i++){
-        var ujx = x + directions[i][0];
-        var ujy = y + directions[i][1];
-        if(m.empty(ujx, ujy) && szagokd[ujx][ujy] < szagokd[x][y]){
+        var newx = x + directions[i][0];
+        var newy = y + directions[i][1];
+        if(m.empty(newx, newy) && stinkd[newx][newy] < stinkd[x][y]){
             options.push(i);
         }
     }
@@ -686,7 +671,7 @@ function mob_level2(x, y){
     return options[Math.floor(Math.random()*options.length)];
 }
 
-function tryToMobMegy(mob){
+function tryToMobMove(mob){
     if(utkozoPlayer(mob)){
         lose = true;
         return false;
@@ -702,25 +687,25 @@ function tryToMobMegy(mob){
 
 
         if(mob.getLevel() == 0){
-            mob.setIrany(mob_level0(mob.getKx(), mob.getKy()));
+            mob.setDirection(mob_level0(mob.getKx(), mob.getKy()));
             mob.setLevel(1);
         }else
-            //1. 75% egyenes 10 % bal 10% jobb 5% fordul
+            //1. 75% straight 10 % left 10% right 5% fordul
         if(mob.getLevel() == 1){
-            mob.setIrany(mob_level1(mob.getKx(), mob.getKy(), mob.getIrany()));
-            if(szagokd[mob.getKx()][mob.getKy()] != undefined){
+            mob.setDirection(mob_level1(mob.getKx(), mob.getKy(), mob.getDirection()));
+            if(stinkd[mob.getKx()][mob.getKy()] != undefined){
                 if(Math.random() <= 0.3){
-                    mob.setIrany(mob_level2(mob.getKx(), mob.getKy()));
+                    mob.setDirection(mob_level2(mob.getKx(), mob.getKy()));
                     mob.setLevel(2);
                 }
             }
         }else
             //2. Szaglás után megy 20%ban elveszti a szagot
         if(mob.getLevel() == 2){
-            if(szagokd[mob.getKx()][mob.getKy()] != undefined){
-                mob.setIrany(mob_level2(mob.getKx(), mob.getKy()));
+            if(stinkd[mob.getKx()][mob.getKy()] != undefined){
+                mob.setDirection(mob_level2(mob.getKx(), mob.getKy()));
                 if(Math.random() <= 0.2){//#TODO TÁVOLSÁGARÁNYOSAN FELEJTSEN SZAGOT
-                    mob.setIrany(mob_level1(mob.getKx(), mob.getKy(), mob.getIrany()));
+                    mob.setDirection(mob_level1(mob.getKx(), mob.getKy(), mob.getDirection()));
                     mob.setLevel(1);
                 }
             }else{
@@ -729,15 +714,15 @@ function tryToMobMegy(mob){
         }
     }
 
-    var vx = directions[mob.getIrany()][0];
-    var vy = directions[mob.getIrany()][1];
+    var vx = directions[mob.getDirection()][0];
+    var vy = directions[mob.getDirection()][1];
 
-    mob.megy(vx * mob.v, vy * mob.v);
+    mob.move(vx * mob.v, vy * mob.v);
     return true;
 }
-function tryToBulletMegy(b){
-    var vx = directions[b.getIrany()][0];
-    var vy = directions[b.getIrany()][1];
+function tryToBulletMove(b){
+    var vx = directions[b.getDirection()][0];
+    var vy = directions[b.getDirection()][1];
 
     var ujx;
     var ujy;
@@ -761,17 +746,17 @@ function tryToBulletMegy(b){
     }
     if (m.empty(ujx, ujy))
     {
-        b.megy();
+        b.move();
         return true;
     }
     return false;
 }
 
-function tryToPlayerMegy(p, irany){
+function tryToPlayerMove(p, direction){
     //Írány beállítása
-    p.setIrany(irany);
-    var vx = directions[irany][0];
-    var vy = directions[irany][1];
+    p.setDirection(direction);
+    var vx = directions[direction][0];
+    var vy = directions[direction][1];
 
     var ujx;
     var ujy;
@@ -808,13 +793,13 @@ function tryToPlayerMegy(p, irany){
         {
             if (p.getX() % tile_size == 0)
             {
-                p.megy(vx * player_velocity_x, vy * player_velocity_y);
+                p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
             else
             if (m.empty(ujx + 1, ujy))
             {
-                p.megy(vx * player_velocity_x, vy * player_velocity_y);
+                p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
         }
@@ -822,13 +807,13 @@ function tryToPlayerMegy(p, irany){
         {
             if (p.getY() % tile_size == 0)
             {
-                p.megy(vx * player_velocity_x, vy * player_velocity_y);
+                p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
             else
             if (m.empty(ujx, ujy + 1))
             {
-                p.megy(vx * player_velocity_x, vy * player_velocity_y);
+                p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
         }
@@ -838,7 +823,7 @@ function tryToPlayerMegy(p, irany){
 
 function lo(p){
     if(!unarmed_active){
-        bullets.push(new Bullet(p.getX(), p.getY(), p.getFx(), p.getFy(), p.getIrany()));
+        bullets.push(new Bullet(p.getX(), p.getY(), p.getFx(), p.getFy(), p.getDirection()));
     }
 }
 
@@ -936,8 +921,8 @@ function doKeyUp(event){
 /*1. szivatások
         -csak néha látás
 */
-szivatas_def = [];
-szivatas_def[0] = new Szivatas("Explosion", -1, function(){
+trouble_def = [];
+trouble_def[0] = new Trouble("Explosion", -1, function(){
     var tolx = Math.max(p_player.getFx() - explosion_size, 0);
     var toly =  Math.max(p_player.getFy() - explosion_size, 0);
 
@@ -954,7 +939,7 @@ szivatas_def[0] = new Szivatas("Explosion", -1, function(){
 }, function(){
     //NO NEED
 });
-/*szivatas_def[1] = new Szivatas("Shortview", zoom_duration, function(){
+/*szivatas_def[1] = new Trouble("Shortview", zoom_duration, function(){
     var ujmeret = base_size * zoom_nagysag;
     corrigate(ujmeret);
     set_meret(ujmeret);
@@ -962,39 +947,39 @@ szivatas_def[0] = new Szivatas("Explosion", -1, function(){
     corrigate(base_size);
     set_meret(base_size);
 });*/
-szivatas_def[1] = new Szivatas("Broken leg", slow_duration, function(){
+trouble_def[1] = new Trouble("Broken leg", slow_duration, function(){
     player_velocity = tile_size / slow_scale;
 }, function(){
     player_velocity = tile_size / 4;
 });
-szivatas_def[2] = new Szivatas("Frenzy", fast_duration, function(){
+trouble_def[2] = new Trouble("Frenzy", fast_duration, function(){
     fast_active = true;
 }, function(){
     fast_active = false;
 });
-szivatas_def[3] = new Szivatas("Unarmed", unarmed_duration, function(){
+trouble_def[3] = new Trouble("Unarmed", unarmed_duration, function(){
     unarmed_active = true;
 }, function(){
     unarmed_active = false;
 });
-szivatas_def[4] = new Szivatas("Stinky", stinky_duration, function(){
+trouble_def[4] = new Trouble("Stinky", stinky_duration, function(){
     stink_dist = base_stink_dist * stinky_scale;
     buzles(new Point(p_player.getFx(), p_player.getFy()));
 }, function(){
     stink_dist = base_stink_dist;
     buzles(new Point(p_player.getFx(), p_player.getFy()));
 });
-szivatas_def[5] = new Szivatas("Reverse control", reverse_duration, function(){
+trouble_def[5] = new Trouble("Reverse control", reverse_duration, function(){
     reverse_active = true;
 }, function(){
     reverse_active = false;
 });
-szivatas_def[6] = new Szivatas("Blackout", blackout_duration, function(){
+trouble_def[6] = new Trouble("Blackout", blackout_duration, function(){
     blackout_active = true;
 }, function(){
     blackout_active = false;
 });
-function add_szivatas(sz){
+function add_trouble(sz){
     //TODO KIIRJA HOGY MILYEN SZIVATAS
     sz.use();
     if(sz.duration > 0){
@@ -1028,42 +1013,42 @@ function runGame(){
     }
     //Szivatás
     if (timer % trouble_rate == 0){
-        add_szivatas(new Szivatas(szivatas_def[next_trouble].name,
-            szivatas_def[next_trouble].duration,
-            szivatas_def[next_trouble].use,
-            szivatas_def[next_trouble].unuse));
+        add_trouble(new Trouble(trouble_def[next_trouble].name,
+            trouble_def[next_trouble].duration,
+            trouble_def[next_trouble].use,
+            trouble_def[next_trouble].unuse));
 
-        next_trouble = Math.floor(Math.random()*szivatas_def.length);
+        next_trouble = Math.floor(Math.random()*trouble_def.length);
     }
 
-    var megy = false;
+    var move = false;
     if(reverse_active){
         for(var i=0; i < 4; i++){
             if(pressedKey[i]){
-                tryToPlayerMegy(p_player, fordul(i));
-                megy = true;
+                tryToPlayerMove(p_player, fordul(i));
+                move = true;
             }
         }
     } else {
         for(var i=0; i < 4; i++){
             if(pressedKey[i]){
-                tryToPlayerMegy(p_player, i);
-                megy = true;
+                tryToPlayerMove(p_player, i);
+                move = true;
             }
         }
     }
-    if(!megy){
-        p_player.megall();
+    if(!move){
+        p_player.stop();
     }
 
     for(var i=0; i < bullets.length; i++){
-        if (!tryToBulletMegy(bullets[i])){
+        if (!tryToBulletMove(bullets[i])){
             bullets_trash.push(i);
         }
     }
 
     for(var i=0; i < mobs.length; i++){
-        tryToMobMegy(mobs[i]);
+        tryToMobMove(mobs[i]);
     }
     //TÖRLÉSEK
     while(bullets_trash.length){
@@ -1105,10 +1090,10 @@ function runGame(){
         newgame();
     }
 
-    info3 = "Rekord: " + ((highscore === -1) ? "NINCS" : highscore);
+    info3 = "Highscore: " + ((highscore === -1) ? "-" : highscore);
     var mennyi = (trouble_rate - timer % trouble_rate) / 10;
-    info2 = szivatas_def[next_trouble].name+": " + mennyi;
-    info1 = "Pontszám: " + score;
+    info2 = trouble_def[next_trouble].name+": " + mennyi;
+    info1 = "Score: " + score;
     timer++;
 }
 function drawMainGame(){
@@ -1149,8 +1134,9 @@ function drawGame(){
     }
 
     ctx.fillStyle = "#00FFFF";
-    ctx.fillText(info1, 60, 50);
-    ctx.fillText(info2, 260, 50);
-    ctx.fillText(info3, 500, 50);
+    ctx.font = "34px Georgia";
+    ctx.fillText(info1, 50, 50);
+    ctx.fillText(info2, 400, 50);
+    ctx.fillText(info3, 800, 50);
 
 }
