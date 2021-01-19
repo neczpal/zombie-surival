@@ -19,6 +19,17 @@ to find path to get to you.
 
 ### Points:
   * 10 / second + 50 / destroyed units
+
+### Incidents:
+Name            | Effect
+-------------   | -------------
+Explosion       | Destroy walls around the player
+Broken leg      | Halves player speed
+Frenzy          | Doubles enemy speed
+Unarmed         | Player can't shot
+Stinky          | Enemies can smell you from twice as far away
+Reverse control | Input controls are swapped
+Blackout        | The display sometimes blackout
      
 ### Try it [here](https://neczpal.github.io/zombie-survival/)
 
@@ -26,7 +37,7 @@ to find path to get to you.
 
 All Rights Reserved.
 
-Copyright (c) 2020 Neczpál Ábel.
+Copyright (c) 2021 Neczpál Ábel.
 
 The project is uploaded for educational purpose.
 Contribution and fair use of the scripts and assets are welcomed,

@@ -580,7 +580,7 @@ function right(direction){
 function left(direction){
     return (direction+3) % 4;
 }
-function fordul(direction){
+function turn(direction){
     return (direction+2) % 4;
 }
 
@@ -612,7 +612,7 @@ function mob_level1(x, y, direction){
             if(temp <= 0.6){
                 return mob_level1(x, y, left(direction));
             }else{
-                return mob_level1(x, y, fordul(direction));
+                return mob_level1(x, y, turn(direction));
             }
         }
     }else
@@ -644,7 +644,7 @@ function mob_level1(x, y, direction){
             }
         }
     }else{
-        direction = fordul(direction);
+        direction = turn(direction);
         var ujx = x + directions[direction][0];
         var ujy = y + directions[direction][1];
         if(m.empty(ujx, ujy)){
@@ -690,7 +690,7 @@ function tryToMobMove(mob){
             mob.setDirection(mob_level0(mob.getKx(), mob.getKy()));
             mob.setLevel(1);
         }else
-            //1. 75% straight 10 % left 10% right 5% fordul
+            //1. 75% straight 10 % left 10% right 5% turn
         if(mob.getLevel() == 1){
             mob.setDirection(mob_level1(mob.getKx(), mob.getKy(), mob.getDirection()));
             if(stinkd[mob.getKx()][mob.getKy()] != undefined){
@@ -1025,7 +1025,7 @@ function runGame(){
     if(reverse_active){
         for(var i=0; i < 4; i++){
             if(pressedKey[i]){
-                tryToPlayerMove(p_player, fordul(i));
+                tryToPlayerMove(p_player, turn(i));
                 move = true;
             }
         }
