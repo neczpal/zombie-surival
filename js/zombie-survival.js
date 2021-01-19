@@ -84,8 +84,6 @@ var corigate_bullet;// tile_size/2 - bullet_size/2
 var view_keret = 10;
 var view_width, view_height;
 
-var arrows;
-
 var info1;
 var info2;
 var info3;
@@ -944,18 +942,23 @@ function doMouseUp(event){
 function doKeyDown(event){
     switch (event.keyCode){
         case 87:
+        case 38:
             pressedKey[0] = true;
             break;
         case 65:
+        case 37:
             pressedKey[3] = true;
             break;
         case 83:
+        case 40:
             pressedKey[2] = true;
             break;
         case 68:
+        case 39:
             pressedKey[1] = true;
             break;
         case 32:
+        case 88:
             pressedKey[4] = true;
             lo(p_player);
             break;
@@ -964,18 +967,23 @@ function doKeyDown(event){
 function doKeyUp(event){
     switch (event.keyCode){
         case 87:
+        case 38:
             pressedKey[0] = false;
             break;
         case 65:
+        case 37:
             pressedKey[3] = false;
             break;
         case 83:
+        case 40:
             pressedKey[2] = false;
             break;
         case 68:
+        case 39:
             pressedKey[1] = false;
             break;
         case 32:
+        case 88:
             pressedKey[4] = false;
             break;
     }

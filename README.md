@@ -14,8 +14,8 @@ to find path to get to you.
    
  
 ### Controls:
-  * Move: WASD
-  * Shot: Space
+  * Move: WASD or Arrows
+  * Shot: Space or X
 
 ### Points:
   * 10 / second + 50 / destroyed units
