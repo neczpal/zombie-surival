@@ -1,14 +1,10 @@
 let c, ctx;
 
-let button_size = 50;
-
 let base_size = 80;
 let base_spawn_rate = 500;
 let base_stink_dist = 12;
 
 let trouble_rate = 250;
-// let zoom_size = 2;
-// let zoom_duration = 5;
 let explosion_size = 2;
 let slow_scale = 8;
 let slow_duration = 7;
@@ -23,7 +19,6 @@ let reverse_active = false;
 let reverse_duration = 5;
 let blackout_active = false;
 let blackout_duration = 8;
-let blackout_day = 15;
 let blackout_night = 35;
 let blackout_is_light = false;
 
@@ -53,7 +48,6 @@ let mob_velocity;
 let spawn_rate;
 
 let mob_skill;//#TODO
-let mob_smell;//#TODO
 let stink_matrix;
 let stink_dist;
 
@@ -64,25 +58,22 @@ let next_trouble;
 let score;
 let high_score = -1;
 
-let m;//Map m;
-let p_player;//Player p;
-let mobs; //List<Mob> mobs = new List<Mob>();
+let map;//Map
+let player;//Player p;
+let mobs; //List
 
-let bullets; //List<Bullet> bullets = new List<Bullet>();
+let bullets; //List
 let bullets_trash = [];
 let mobs_trash = [];
 
-//let trouble_trash = [];
-let pressedKey = []; //HashSet<int> pressedKey = new HashSet<int>();
+let pressedKey = []; //HashSet
 
-let buttons = [];
 
 let lose = false;
 let tiles_pos_x; // i*tile_size
 let tiles_pos_y; // j*tile_size
-let corigate_x;// = 640 / 2 + tile_size/2;
-let corigate_y;// = 480 / 2 + tile_size/2;
-let corigate_bullet;// tile_size/2 - bullet_size/2
+
+let corrected_bullet;// tile_size/2 - bullet_size/2
 
 let view_frame = 10;
 let view_width, view_height;
@@ -148,27 +139,10 @@ const zombieBotImages = [zombieBotImage1, zombieBotImage2, zombieBotImage3];
 
 const zombieImages = [zombieTopImages, zombieRightImages, zombieBotImages, zombieLeftImages];
 
+//Used for the stinks method
 function Point (x, y) {
     this.x = x;
     this.y = y;
-}
-
-function MyButton (x, y, numb) {
-    this.x = x;
-    this.y = y;
-    this.numb = numb;
-
-    this.isInside = function (px, py) {
-        return this.x <= px && px <= this.x + button_size && this.y <= py && py <= this.y + button_size;
-    }
-    this.draw = function () {
-        if (pressedKey[numb]) {
-            ctx.fillStyle = "#888888";
-        } else {
-            ctx.fillStyle = "#444444";
-        }
-        ctx.fillRect (x, y, button_size, button_size);
-    }
 }
 
 function Map (w, h) {
@@ -214,9 +188,6 @@ function Map (w, h) {
         }
     }
 
-    /*this.get = function(i, j){
-        return this.tiles[i][j];
-    };*/
     this.set = function (i, j, z) {
         this.tiles[i][j] = z;
     };
@@ -231,8 +202,6 @@ function Map (w, h) {
             for (let j = 0; j < this.height; j++) {
                 if (this.tiles[i][j] === 1) {
                     ctx.drawImage (crateImage, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
-                    // ctx.fillStyle = "#FFFFFF";
-                    // ctx.fillRect(tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
                 } else {
                     ctx.drawImage (floorImage, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
                 }
@@ -284,7 +253,6 @@ function Player (kx, ky) {
             this.fx = tmp_x;
             this.fy = tmp_y;
             stinks (new Point (tmp_x, tmp_y));
-            //setTimeout(function(){ stinks(new Point(tmp_x, tmp_y));}, 0);
         }
     };
     this.stop = function () {
@@ -327,8 +295,8 @@ function Player (kx, ky) {
     this.getDirection = function () {
         return this.direction;
     };
-    this.setDirection = function (ir) {
-        this.direction = ir;
+    this.setDirection = function (dir) {
+        this.direction = dir;
     };
 
     this.draw = function (mx, my) {
@@ -347,11 +315,11 @@ function Mob (kx, ky, l) {
     this.v = mob_velocity;
     this.direction = 0;
 
-    this.resize = function (ujmeret) {
-        this.x = this.x / tile_size * ujmeret;
-        this.y = this.y / tile_size * ujmeret;
-        this.x2 = this.x + ujmeret;
-        this.y2 = this.y + ujmeret;
+    this.resize = function (new_size) {
+        this.x = this.x / tile_size * new_size;
+        this.y = this.y / tile_size * new_size;
+        this.x2 = this.x + new_size;
+        this.y2 = this.y + new_size;
     };
 
     this.move = function (vx, vy) {
@@ -411,19 +379,19 @@ function Mob (kx, ky, l) {
 function Bullet (x, y, kx, ky, direction) {
     this.kx = kx;
     this.ky = ky;
-    this.x = x + corigate_bullet;
-    this.y = y + corigate_bullet;
+    this.x = x + corrected_bullet;
+    this.y = y + corrected_bullet;
     this.x2 = this.x + bullet_size;
     this.y2 = this.y + bullet_size;
     this.ox = this.x + tile_size / 2;
     this.oy = this.y + tile_size / 2;
     this.direction = direction;
 
-    this.resize = function (ujmeret) {
-        this.x = this.x / tile_size * ujmeret;
-        this.y = this.y / tile_size * ujmeret;
-        this.x2 = this.x + ujmeret;
-        this.y2 = this.y + ujmeret;
+    this.resize = function (new_size) {
+        this.x = this.x / tile_size * new_size;
+        this.y = this.y / tile_size * new_size;
+        this.x2 = this.x + new_size;
+        this.y2 = this.y + new_size;
     };
 
     this.move = function () {
@@ -483,39 +451,7 @@ function Trouble (name, duration, use, unuse) {
     this.unuse = unuse;
 }
 
-// function set_meret(meret){
-//
-//     tile_size = meret;
-//     bullet_size = meret/4;
-//     player_velocity = meret/4;
-//     bullet_velocity = meret/2;
-//     mob_velocity = meret/4;
-//
-//     corigate_x = view_width / 2 - tile_size/2;
-//     corigate_y = view_height / 2 - tile_size/2;
-//
-//     tiles_pos_x = [];
-//     for(let i=0; i < map_width; i++){
-//         tiles_pos_x[i] = i * tile_size;
-//     }
-//
-//     tiles_pos_y = [];
-//     for(let j=0; j < map_height; j++){
-//         tiles_pos_y[j] = j * tile_size;
-//     }
-//     corigate_bullet = tile_size/2 - bullet_size/2;
-// }
-// function corrigate(meret){
-//     p_player.resize(meret);
-//     for(let i=0; i < mobs.length; i++){
-//         mobs[i].resize(meret);
-//     }
-//     for(let i=0; i < bullets.length; i++){
-//         bullets[i].resize(meret);
-//     }
-// }
-
-function newgame () {
+function newGame () {
     lose = false;
 
     mobs = [];
@@ -547,14 +483,14 @@ function newgame () {
     for (let j = 0; j < map_height; j++) {
         tiles_pos_y[j] = j * tile_size;
     }
-    corigate_bullet = tile_size / 2 - bullet_size / 2;
+    corrected_bullet = tile_size / 2 - bullet_size / 2;
 
 
-    m = new Map (map_width, map_height);
-    m.set (map_width / 2, map_height / 2, 0);
-    p_player = new Player (map_width / 2, map_height / 2);
+    map = new Map (map_width, map_height);
+    map.set (map_width / 2, map_height / 2, 0);
+    player = new Player (map_width / 2, map_height / 2);
 
-    stinks (new Point (p_player.getFx (), p_player.getFy ()));
+    stinks (new Point (player.getFx (), player.getFy ()));
     next_trouble = Math.floor (Math.random () * trouble_def.length);
 }
 
@@ -573,25 +509,25 @@ function stinks (point) {
     queue.push (point);
     while (queue.length !== 0) {
         let c_point = queue.shift ();
-        if (m.empty (c_point.x + 1, c_point.y) && stink_matrix[c_point.x + 1][c_point.y] === undefined) {
+        if (map.empty (c_point.x + 1, c_point.y) && stink_matrix[c_point.x + 1][c_point.y] === undefined) {
             stink_matrix[c_point.x + 1][c_point.y] = stink_matrix[c_point.x][c_point.y] + 1;
             if (stink_matrix[c_point.x + 1][c_point.y] < stink_dist) {
                 queue.push (new Point (c_point.x + 1, c_point.y));
             }
         }
-        if (m.empty (c_point.x - 1, c_point.y) && stink_matrix[c_point.x - 1][c_point.y] === undefined) {
+        if (map.empty (c_point.x - 1, c_point.y) && stink_matrix[c_point.x - 1][c_point.y] === undefined) {
             stink_matrix[c_point.x - 1][c_point.y] = stink_matrix[c_point.x][c_point.y] + 1;
             if (stink_matrix[c_point.x - 1][c_point.y] < stink_dist) {
                 queue.push (new Point (c_point.x - 1, c_point.y));
             }
         }
-        if (m.empty (c_point.x, c_point.y + 1) && stink_matrix[c_point.x][c_point.y + 1] === undefined) {
+        if (map.empty (c_point.x, c_point.y + 1) && stink_matrix[c_point.x][c_point.y + 1] === undefined) {
             stink_matrix[c_point.x][c_point.y + 1] = stink_matrix[c_point.x][c_point.y] + 1;
             if (stink_matrix[c_point.x][c_point.y + 1] < stink_dist) {
                 queue.push (new Point (c_point.x, c_point.y + 1));
             }
         }
-        if (m.empty (c_point.x, c_point.y - 1) && stink_matrix[c_point.x][c_point.y - 1] === undefined) {
+        if (map.empty (c_point.x, c_point.y - 1) && stink_matrix[c_point.x][c_point.y - 1] === undefined) {
             stink_matrix[c_point.x][c_point.y - 1] = stink_matrix[c_point.x][c_point.y] + 1;
             if (stink_matrix[c_point.x][c_point.y - 1] < stink_dist) {
                 queue.push (new Point (c_point.x, c_point.y - 1));
@@ -602,10 +538,7 @@ function stinks (point) {
 
 function mobCollide (x, y) {
     for (let i = 0; i < mobs.length; i++) {
-        if (mobs[i].isInside (x, y)/* ||
-	                    mobs[i].isInside(x2, y) ||
-	                    mobs[i].isInside(x2, y2) ||
-	                    mobs[i].isInside(x, y2)*/) {
+        if (mobs[i].isInside (x, y)) {
             return i;
         }
     }
@@ -613,22 +546,7 @@ function mobCollide (x, y) {
 }
 
 function playerCollide (m) {
-    /*let left_top = m.isInside(p_player.getX(), p_player.getY());
-    let right_top = m.isInside(p_player.getX2(), p_player.getY());
-    let right_bot = m.isInside(p_player.getX2(), p_player.getY2());
-    let left_bot = m.isInside(p_player.getX(), p_player.getY2());
-
-    if(p_player.getX() % tile_size === 0){
-
-    }
-    let left_right =
-
-    return (left_top && right_top ||
-            right_top && right_bot ||
-            right_bot && left_bot ||
-            left_bot && left_top);
-            */
-    return m.isInside (p_player.getOx (), p_player.getOy ());
+    return m.isInside (player.getOx (), player.getOy ());
 }
 
 function right (direction) {
@@ -649,7 +567,7 @@ function mob_level0 (x, y) {
     for (let i = 0; i < 4; i++) {
         ujx = x + directions[i][0];
         ujy = y + directions[i][1];
-        if (m.empty (ujx, ujy)) {
+        if (map.empty (ujx, ujy)) {
             opt.push (i);
         }
     }
@@ -663,7 +581,7 @@ function mob_level1 (x, y, direction) {
     if (temp <= 0.75) {
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
-        if (m.empty (new_x, new_y)) {
+        if (map.empty (new_x, new_y)) {
             return direction;
         } else {
             if (temp <= 0.3) {
@@ -678,7 +596,7 @@ function mob_level1 (x, y, direction) {
         direction = left (direction);
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
-        if (m.empty (new_x, new_y)) {
+        if (map.empty (new_x, new_y)) {
             return direction;
         } else {
             if (temp <= 0.8) {
@@ -691,7 +609,7 @@ function mob_level1 (x, y, direction) {
         direction = right (direction);
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
-        if (m.empty (new_x, new_y)) {
+        if (map.empty (new_x, new_y)) {
             return direction;
         } else {
             if (temp <= 0.9) {
@@ -704,7 +622,7 @@ function mob_level1 (x, y, direction) {
         direction = turn (direction);
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
-        if (m.empty (new_x, new_y)) {
+        if (map.empty (new_x, new_y)) {
             return direction;
         } else {
             if (temp <= 0.975) {
@@ -721,7 +639,7 @@ function mob_level2 (x, y) {
     for (let i = 0; i < 4; i++) {
         let new_x = x + directions[i][0];
         let new_y = y + directions[i][1];
-        if (m.empty (new_x, new_y) && stink_matrix[new_x][new_y] < stink_matrix[x][y]) {
+        if (map.empty (new_x, new_y) && stink_matrix[new_x][new_y] < stink_matrix[x][y]) {
             options.push (i);
         }
     }
@@ -807,7 +725,7 @@ function tryToMoveBullet (b) {
         score += 50;
         return false;
     }
-    if (m.empty (new_coords[0], new_coords[1])) {
+    if (map.empty (new_coords[0], new_coords[1])) {
         b.move ();
         return true;
     }
@@ -833,13 +751,13 @@ function tryToMovePlayer (p, direction) {
         return false;
     }
 
-    if (m.empty (new_coords[0], new_coords[1])) {
+    if (map.empty (new_coords[0], new_coords[1])) {
 
         if (vy !== 0) {
             if (p.getX () % tile_size === 0) {
                 p.move (vx * player_velocity_x, vy * player_velocity_y);
                 return true;
-            } else if (m.empty (new_coords[0] + 1, new_coords[1])) {
+            } else if (map.empty (new_coords[0] + 1, new_coords[1])) {
                 p.move (vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
@@ -847,7 +765,7 @@ function tryToMovePlayer (p, direction) {
             if (p.getY () % tile_size === 0) {
                 p.move (vx * player_velocity_x, vy * player_velocity_y);
                 return true;
-            } else if (m.empty (new_coords[0], new_coords[1] + 1)) {
+            } else if (map.empty (new_coords[0], new_coords[1] + 1)) {
                 p.move (vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
@@ -864,49 +782,20 @@ function shot (p) {
 
 
 function refresh () {
-    c.width = c.width;
+    c.width = c.width;//Old hack not sure if neccessary
 }
 
 function init () {
     c = document.getElementById ("surface");
     view_width = c.width = window.innerWidth - view_frame;
     view_height = c.height = window.innerHeight - view_frame;
+
     ctx = c.getContext ("2d");
-    ctx.font = "30px Verdana";
-    //c.addEventListener("mousedown", doMouseDown, false);
-    //c.addEventListener("mouseup", doMouseUp, false);
-    //c.addEventListener("touchstart", handleStart, false);
-    //c.addEventListener("touchend", handleEnd, false);
+
     window.addEventListener ("keydown", doKeyDown, false);
     window.addEventListener ("keyup", doKeyUp, false);
 
-    buttons[0] = new MyButton (100, 360, 0);
-    buttons[1] = new MyButton (150, 400, 1);
-    buttons[2] = new MyButton (100, 440, 2);
-    buttons[3] = new MyButton (50, 400, 3);
-    buttons[4] = new MyButton (550, 400, 4);
-
-    newgame ();
-}
-
-function doMouseDown (event) {
-    //alert("x: "+event.pageX+" y:" + event.pageY);
-    for (let i = 0; i < 5; i++) {
-        if (buttons[i].isInside (event.pageX, event.pageY)) {
-            pressedKey[i] = true;
-            if (i === 4) {
-                shot (p_player);
-            }
-        }
-    }
-}
-
-function doMouseUp (event) {
-    for (let i = 0; i < 5; i++) {
-        if (buttons[i].isInside (event.pageX, event.pageY)) {
-            pressedKey[i] = false;
-        }
-    }
+    newGame ();
 }
 
 function doKeyEvent (event, state) {
@@ -955,7 +844,7 @@ function doKeyEvent (event, state) {
         case 88:
             pressedKey[4] = state;
             if (state)
-                shot (p_player);
+                shot (player);
             break;
     }
 }
@@ -970,19 +859,19 @@ function doKeyUp (event) {
 
 trouble_def = [];
 trouble_def[0] = new Trouble ("Explosion", -1, function () {
-    let from_x = Math.max (p_player.getFx () - explosion_size, 0);
-    let from_y = Math.max (p_player.getFy () - explosion_size, 0);
+    let from_x = Math.max (player.getFx () - explosion_size, 0);
+    let from_y = Math.max (player.getFy () - explosion_size, 0);
 
-    let to_x = Math.min (p_player.getFx () + explosion_size + 1, m.getWidth ());
-    let to_y = Math.min (p_player.getFy () + explosion_size + 1, m.getHeight ());
+    let to_x = Math.min (player.getFx () + explosion_size + 1, map.getWidth ());
+    let to_y = Math.min (player.getFy () + explosion_size + 1, map.getHeight ());
 
     for (let i = from_x; i < to_x; i++) {
         for (let j = from_y; j < to_y; j++) {
-            m.set (i, j, 0);
+            map.set (i, j, 0);
         }
     }
 
-    stinks (new Point (p_player.getFx (), p_player.getFy ()));
+    stinks (new Point (player.getFx (), player.getFy ()));
 }, function () {
     //NO NEED
 });
@@ -1004,10 +893,10 @@ trouble_def[3] = new Trouble ("Unarmed", unarmed_duration, function () {
 });
 trouble_def[4] = new Trouble ("Stinky", stinky_duration, function () {
     stink_dist = base_stink_dist * stinky_scale;
-    stinks (new Point (p_player.getFx (), p_player.getFy ()));
+    stinks (new Point (player.getFx (), player.getFy ()));
 }, function () {
     stink_dist = base_stink_dist;
-    stinks (new Point (p_player.getFx (), p_player.getFy ()));
+    stinks (new Point (player.getFx (), player.getFy ()));
 });
 trouble_def[5] = new Trouble ("Reverse control", reverse_duration, function () {
     reverse_active = true;
@@ -1019,19 +908,10 @@ trouble_def[6] = new Trouble ("Blackout", blackout_duration, function () {
 }, function () {
     blackout_active = false;
 });
-// #TODO Not working as intended
-// trouble_def[7] = new Trouble("Shortview", zoom_duration, function(){
-//     let ujmeret = base_size * zoom_size;
-//     corrigate(ujmeret);
-//     set_meret(ujmeret);
-// }, function(){
-//     corrigate(base_size);
-//     set_meret(base_size);
-// });
-function add_trouble (sz) {
-    sz.use ();
-    if (sz.duration > 0) {
-        current_trouble = sz;
+function add_trouble (trouble) {
+    trouble.use ();
+    if (trouble.duration > 0) {
+        current_trouble = trouble;
     } else {
         current_trouble = -1;
     }
@@ -1076,20 +956,20 @@ function runGame () {
     if (reverse_active) {
         for (let i = 0; i < 4; i++) {
             if (pressedKey[i]) {
-                tryToMovePlayer (p_player, turn (i));
+                tryToMovePlayer (player, turn (i));
                 move = true;
             }
         }
     } else {
         for (let i = 0; i < 4; i++) {
             if (pressedKey[i]) {
-                tryToMovePlayer (p_player, i);
+                tryToMovePlayer (player, i);
                 move = true;
             }
         }
     }
     if (!move) {
-        p_player.stop ();
+        player.stop ();
     }
 
     for (let i = 0; i < bullets.length; i++) {
@@ -1112,16 +992,16 @@ function runGame () {
     if (Math.floor (Math.random () * 10000) < spawn_rate) {
         switch (Math.floor (Math.random () * 4)) {
             case 0:
-                mobs.push (new Mob (0, Math.floor (Math.random () * m.getHeight ()), 0));
+                mobs.push (new Mob (0, Math.floor (Math.random () * map.getHeight ()), 0));
                 break;
             case 1:
-                mobs.push (new Mob (m.getWidth () - 1, Math.floor (Math.random () * m.getHeight ()), 0));
+                mobs.push (new Mob (map.getWidth () - 1, Math.floor (Math.random () * map.getHeight ()), 0));
                 break;
             case 2:
-                mobs.push (new Mob (Math.floor (Math.random () * m.getWidth ()), 0, 0));
+                mobs.push (new Mob (Math.floor (Math.random () * map.getWidth ()), 0, 0));
                 break;
             case 3:
-                mobs.push (new Mob (Math.floor (Math.random () * m.getWidth ()), m.getHeight () - 1, 0));
+                mobs.push (new Mob (Math.floor (Math.random () * map.getWidth ()), map.getHeight () - 1, 0));
                 break;
         }
     }
@@ -1135,7 +1015,7 @@ function runGame () {
             current_trouble.unuse ();
         }
 
-        newgame ();
+        newGame ();
     }
 
     info_high_score = "High score: " + ((high_score === -1) ? "-" : high_score);
@@ -1146,10 +1026,10 @@ function runGame () {
 }
 
 function drawMainGame () {
-    let mx = p_player.getX () - corigate_x;
-    let my = p_player.getY () - corigate_y;
-    m.draw (mx, my, tile_size);
-    p_player.draw (mx, my);
+    let mx = player.getX () - corigate_x;
+    let my = player.getY () - corigate_y;
+    map.draw (mx, my, tile_size);
+    player.draw (mx, my);
 
 
     for (let i = 0; i < mobs.length; i++) {
