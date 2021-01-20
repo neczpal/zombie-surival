@@ -216,7 +216,7 @@ function Map (w, h) {
     };
 }
 
-function GameObject(kx, ky, x, y) {
+function GameObject (kx, ky, x, y) {
     this.kx = kx;
     this.ky = ky;
     this.x = x;//kx * tile_size;
@@ -290,13 +290,13 @@ GameObject.prototype = {
 }
 
 function Player (kx, ky) {
-    GameObject.call(this, kx, ky, kx * tile_size, ky * tile_size);
+    GameObject.call (this, kx, ky, kx * tile_size, ky * tile_size);
 
     this.fx = Math.floor ((this.x + tile_size / 2) / tile_size);
     this.fy = Math.floor ((this.y + tile_size / 2) / tile_size);
 
     this.move = function (vx, vy) {
-        GameObject.prototype.move.call(this, vx, vy);
+        GameObject.prototype.move.call (this, vx, vy);
 
         let tmp_x = Math.floor ((this.x + tile_size / 2) / tile_size);
         let tmp_y = Math.floor ((this.y + tile_size / 2) / tile_size);
@@ -321,11 +321,11 @@ function Player (kx, ky) {
 }
 
 Player.prototype = GameObject.prototype;
-Player.prototype = new GameObject();
+Player.prototype = new GameObject ();
 Player.prototype.constructor = Player;
 
 function Mob (kx, ky, lev) {
-    GameObject.call(this, kx, ky, kx * tile_size, ky * tile_size);
+    GameObject.call (this, kx, ky, kx * tile_size, ky * tile_size);
 
     this.level = lev;
 
@@ -342,11 +342,11 @@ function Mob (kx, ky, lev) {
 }
 
 Mob.prototype = GameObject.prototype;
-Mob.prototype = new GameObject();
+Mob.prototype = new GameObject ();
 Mob.prototype.constructor = Mob;
 
 function Bullet (x, y, kx, ky, direction) {
-    GameObject.call(this, kx, ky, x+corrected_bullet, y+corrected_bullet);
+    GameObject.call (this, kx, ky, x + corrected_bullet, y + corrected_bullet);
 
     this.direction = direction;
 
@@ -367,7 +367,7 @@ function Bullet (x, y, kx, ky, direction) {
 }
 
 Bullet.prototype = GameObject.prototype;
-Bullet.prototype = new GameObject();
+Bullet.prototype = new GameObject ();
 Bullet.prototype.constructor = Bullet;
 
 function Trouble (name, duration, use, undo_use) {
@@ -488,12 +488,12 @@ function turn (direction) {
 }
 
 function mob_level0 (x, y) {
-    let ujx, ujy, opt = [];
+    let new_x, new_y, opt = [];
 
     for (let i = 0; i < 4; i++) {
-        ujx = x + directions[i][0];
-        ujy = y + directions[i][1];
-        if (map.empty (ujx, ujy)) {
+        new_x = x + directions[i][0];
+        new_y = y + directions[i][1];
+        if (map.empty (new_x, new_y)) {
             opt.push (i);
         }
     }
@@ -507,6 +507,7 @@ function mob_level1 (x, y, direction) {
     if (temp <= 0.75) {
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
+
         if (map.empty (new_x, new_y)) {
             return direction;
         } else {
@@ -522,6 +523,7 @@ function mob_level1 (x, y, direction) {
         direction = left (direction);
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
+
         if (map.empty (new_x, new_y)) {
             return direction;
         } else {
@@ -535,6 +537,7 @@ function mob_level1 (x, y, direction) {
         direction = right (direction);
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
+
         if (map.empty (new_x, new_y)) {
             return direction;
         } else {
@@ -548,6 +551,7 @@ function mob_level1 (x, y, direction) {
         direction = turn (direction);
         let new_x = x + directions[direction][0];
         let new_y = y + directions[direction][1];
+
         if (map.empty (new_x, new_y)) {
             return direction;
         } else {
@@ -706,11 +710,6 @@ function shot (p) {
     }
 }
 
-
-function refresh () {
-    c.width = c.width;//Old hack not sure if necessary
-}
-
 function init () {
     c = document.getElementById ("surface");
     view_width = c.width = window.innerWidth - view_frame;
@@ -739,35 +738,35 @@ function doKeyEvent (event, state) {
         case 'w':
         case 'Up':
         case 'ArrowUp':
-        case 87:
-        case 38:
+        case  87:
+        case  38:
             pressedKey[0] = state;
             break;
         case 'a':
         case 'Left':
         case 'ArrowLeft':
-        case 65:
-        case 37:
+        case  65:
+        case  37:
             pressedKey[3] = state;
             break;
         case 's':
         case 'Down':
         case 'ArrowDown':
-        case 83:
-        case 40:
+        case  83:
+        case  40:
             pressedKey[2] = state;
             break;
         case 'd':
         case 'Right':
         case 'ArrowRight':
-        case 68:
-        case 39:
+        case  68:
+        case  39:
             pressedKey[1] = state;
             break;
         case ' ':
         case 'x':
-        case 32:
-        case 88:
+        case  32:
+        case  88:
             pressedKey[4] = state;
             if (state)
                 shot (player);
@@ -834,6 +833,7 @@ trouble_def[6] = new Trouble ("Blackout", blackout_duration, function () {
 }, function () {
     blackout_active = false;
 });
+
 function add_trouble (trouble) {
     trouble.use ();
     if (trouble.duration > 0) {
@@ -968,7 +968,6 @@ function drawMainGame () {
 }
 
 function drawGame () {
-    refresh ();
 
     if (blackout_active) {
         if (timer % blackout_night === 0) {
