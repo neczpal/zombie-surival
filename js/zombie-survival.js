@@ -778,7 +778,7 @@ function tryToMobMove(mob){
     return true;
 }
 
-function getCoordsInDirection(kx, ky, direction) {
+function getCoordsInDirection(kx, ky, x, y, direction) {
     let vx = directions[direction][0];
     let vy = directions[direction][1];
 
@@ -788,9 +788,9 @@ function getCoordsInDirection(kx, ky, direction) {
     {
         new_x = kx;
         new_y = ky;
-        if (kx % tile_size === 0)
+        if (x % tile_size === 0)
             new_x += vx;
-        if (ky % tile_size === 0)
+        if (y % tile_size === 0)
             new_y += vy;
     } else {
         new_x = kx + vx;
@@ -801,7 +801,7 @@ function getCoordsInDirection(kx, ky, direction) {
 }
 
 function tryToMoveBullet(b){
-    let new_coords = getCoordsInDirection(b.getKx(),b.getKy(), b.getDirection());
+    let new_coords = getCoordsInDirection(b.getKx(), b.getKy(), b.getX(), b.getY(), b.getDirection());
 
     let index;
     if ((index = mobCollide(b.getOx(), b.getOy())) !== -1) {
@@ -819,7 +819,7 @@ function tryToMoveBullet(b){
 function tryToMovePlayer(p, direction){
     //Setting direction
     p.setDirection(direction);
-    let new_coords = getCoordsInDirection(p.getKx(),p.getKy(), direction);
+    let new_coords = getCoordsInDirection(p.getKx(),p.getKy(), p.getX(), p.getY(),  direction);
     let vx = directions[direction][0];
     let vy = directions[direction][1];
 
@@ -830,12 +830,11 @@ function tryToMovePlayer(p, direction){
         player_velocity_y = player_velocity;
     }
 
-    let index;
-
-    if ((index = mobCollide(p.getOx(), p.getOy())) !== -1) {
+    if (mobCollide(p.getOx(), p.getOy()) !== -1) {
         lose = true;
         return false;
     }
+
     if (m.empty(new_coords[0], new_coords[1])) {
 
         if (vy !== 0) {
