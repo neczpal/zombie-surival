@@ -777,32 +777,39 @@ function tryToMobMove(mob){
     mob.move(vx * mob.v, vy * mob.v);
     return true;
 }
-function tryToMoveBullet(b){
-    let vx = directions[b.getDirection()][0];
-    let vy = directions[b.getDirection()][1];
+
+function getCoordsInDirection(kx, ky, direction) {
+    let vx = directions[direction][0];
+    let vy = directions[direction][1];
 
     let new_x;
     let new_y;
     if (vx < 0 || vy < 0)
     {
-        new_x = b.getKx();
-        new_y = b.getKy();
-        if (b.getX() % tile_size === 0)
+        new_x = kx;
+        new_y = ky;
+        if (kx % tile_size === 0)
             new_x += vx;
-        if (b.getY() % tile_size === 0)
+        if (ky % tile_size === 0)
             new_y += vy;
     } else {
-        new_x = b.getKx() + vx;
-        new_y = b.getKy() + vy;
+        new_x = kx + vx;
+        new_y = ky + vy;
     }
+
+    return [new_x, new_y];
+}
+
+function tryToMoveBullet(b){
+    let new_coords = getCoordsInDirection(b.getKx(),b.getKy(), b.getDirection());
+
     let index;
-    if ((index = mobCollide(b.getOx(), b.getOy())) !== -1){
+    if ((index = mobCollide(b.getOx(), b.getOy())) !== -1) {
         mobs_trash.push(index);
         score += 50;
         return false;
     }
-    if (m.empty(new_x, new_y))
-    {
+    if (m.empty(new_coords[0], new_coords[1])) {
         b.move();
         return true;
     }
@@ -812,23 +819,9 @@ function tryToMoveBullet(b){
 function tryToMovePlayer(p, direction){
     //Setting direction
     p.setDirection(direction);
+    let new_coords = getCoordsInDirection(p.getKx(),p.getKy(), direction);
     let vx = directions[direction][0];
     let vy = directions[direction][1];
-
-    let new_x;
-    let new_y;
-    if (vx < 0 || vy < 0)
-    {
-        new_x = p.getKx();
-        new_y = p.getKy();
-        if (p.getX() % tile_size === 0)
-            new_x += vx;
-        if (p.getY() % tile_size === 0)
-            new_y += vy;
-    } else {
-        new_x = p.getKx() + vx;
-        new_y = p.getKy() + vy;
-    }
 
     if(p.getX() % tile_size === 0){
         player_velocity_x = player_velocity;
@@ -839,36 +832,29 @@ function tryToMovePlayer(p, direction){
 
     let index;
 
-    if ((index = mobCollide(p.getOx(), p.getOy())) !== -1){
+    if ((index = mobCollide(p.getOx(), p.getOy())) !== -1) {
         lose = true;
         return false;
     }
-    if (m.empty(new_x, new_y))
-    {
+    if (m.empty(new_coords[0], new_coords[1])) {
 
-        if (vy !== 0)
-        {
-            if (p.getX() % tile_size === 0)
-            {
+        if (vy !== 0) {
+            if (p.getX() % tile_size === 0) {
+                p.move(vx * player_velocity_x, vy * player_velocity_y);
+                return true;
+            } else
+            if (m.empty(new_coords[0] + 1, new_coords[1])) {
                 p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
-            else
-            if (m.empty(new_x + 1, new_y))
-            {
-                p.move(vx * player_velocity_x, vy * player_velocity_y);
-                return true;
-            }
-        }
-        else//if (vx !==0)
-        {
+        } else { //if (vx !==0) {
             if (p.getY() % tile_size === 0)
             {
                 p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
             else
-            if (m.empty(new_x, new_y + 1))
+            if (m.empty(new_coords[0], new_coords[1] + 1))
             {
                 p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
@@ -878,7 +864,7 @@ function tryToMovePlayer(p, direction){
     return false;
 }
 
-function lo(p){
+function shot(p){
     if(!unarmed_active){
         bullets.push(new Bullet(p.getX(), p.getY(), p.getFx(), p.getFy(), p.getDirection()));
     }
@@ -917,7 +903,7 @@ function doMouseDown(event){
         if(buttons[i].isInside(event.pageX, event.pageY)){
             pressedKey[i] = true;
             if(i === 4){
-                lo(p_player);
+                shot(p_player);
             }
         }
     }
@@ -931,7 +917,7 @@ function doMouseUp(event){
     }
 }
 
-function doKeyDown(event){
+function doKeyEvent(event, state) {
     let code;
     //Keycode deprecated
     if (event.key !== undefined) {
@@ -948,85 +934,44 @@ function doKeyDown(event){
         case 'ArrowUp':
         case 87:
         case 38:
-            pressedKey[0] = true;
+            pressedKey[0] = state;
             break;
         case 'a':
         case 'Left':
         case 'ArrowLeft':
         case 65:
         case 37:
-            pressedKey[3] = true;
+            pressedKey[3] = state;
             break;
         case 's':
         case 'Down':
         case 'ArrowDown':
         case 83:
         case 40:
-            pressedKey[2] = true;
+            pressedKey[2] = state;
             break;
         case 'd':
         case 'Right':
         case 'ArrowRight':
         case 68:
         case 39:
-            pressedKey[1] = true;
+            pressedKey[1] = state;
             break;
         case ' ':
         case 'x':
         case 32:
         case 88:
-            pressedKey[4] = true;
-            lo(p_player);
+            pressedKey[4] = state;
+            if (state)
+                shot(p_player);
             break;
     }
 }
+function doKeyDown(event){
+    doKeyEvent(event, true);
+}
 function doKeyUp(event){
-    let code;
-    //Keycode deprecated
-    if (event.key !== undefined) {
-        code = event.key;
-    } else if (event.keyIdentifier !== undefined) {
-        code = event.keyIdentifier;
-    } else if (event.keyCode !== undefined) {
-        code = event.keyCode;
-    }
-
-    switch (code){
-        case 'w':
-        case 'Up':
-        case 'ArrowUp':
-        case 87:
-        case 38:
-            pressedKey[0] = false;
-            break;
-        case 'a':
-        case 'Left':
-        case 'ArrowLeft':
-        case 65:
-        case 37:
-            pressedKey[3] = false;
-            break;
-        case 's':
-        case 'Down':
-        case 'ArrowDown':
-        case 83:
-        case 40:
-            pressedKey[2] = false;
-            break;
-        case 'd':
-        case 'Right':
-        case 'ArrowRight':
-        case 68:
-        case 39:
-            pressedKey[1] = false;
-            break;
-        case ' ':
-        case 'x':
-        case 32:
-        case 88:
-            pressedKey[4] = false;
-            break;
-    }
+    doKeyEvent(event, false);
 }
 
 trouble_def = [];
