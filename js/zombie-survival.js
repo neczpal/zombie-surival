@@ -1,92 +1,95 @@
-var c, ctx;
+let c, ctx;
 
-var butsize = 50;
+let button_size = 50;
 
-var base_size = 80;
-var base_spawnrate = 500;
-var base_stink_dist = 12;
+let base_size = 80;
+let base_spawn_rate = 500;
+let base_stink_dist = 12;
 
-var bullet_size;
-var tile_size;
+let trouble_rate = 250;
+// let zoom_size = 2;
+// let zoom_duration = 5;
+let explosion_size = 2;
+let slow_scale = 8;
+let slow_duration = 7;
+let fast_active = false;
+let fast_scale = 2;
+let fast_duration = 4;
+let unarmed_active = false;
+let unarmed_duration = 5;
+let stinky_scale = 2;
+let stinky_duration = 10;
+let reverse_active = false;
+let reverse_duration = 5;
+let blackout_active = false;
+let blackout_duration = 8;
+let blackout_day = 15;
+let blackout_night = 35;
+let blackout_is_light = false;
 
-var bullet_velocity;
-var player_velocity;
-var player_velocity_x;
-var player_velocity_y;
-var mob_velocity;
-var spawn_rate;
+let wall_rate = 35;
+let wall_min = 3;
+let wall_max = 5;
 
-var mobskill;//#TODO
-var mobszaglas;//#TODO
-var stinkd;
-var stink_dist;
+let map_width = 50;
+let map_height = 50;
 
-var trouble_rate = 250;
-var current_trouble;
-var next_trouble;
-var zoom_size = 2;
-var zoom_duration = 5;
-var explosion_size = 2;
-var slow_scale = 8;
-var slow_duration = 7;
-var fast_active = false;
-var fast_scale = 2;
-var fast_duration = 4;
-var unarmed_active = false;
-var unarmed_duration = 5;
-var stinky_scale = 2;
-var stinky_duration = 10;
-var reverse_active = false;
-var reverse_duration = 5;
-var blackout_active = false;
-var blackout_duration = 8;
-var blackout_day = 15;
-var blackout_night = 35;
-var blackout_is_dark = false;
+let tick = 10;
+let timer;
 
-var wall_rate = 35;
-var wall_min = 3;
-var wall_max = 5;
+let anim_index = 0;
+let animation_rate = 2;
 
-var map_width = 50;
-var map_height = 50;
+let directions = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
-var tick = 10;
-var timer;
+let bullet_size;
+let tile_size;
 
-var anim_index = 0;
-var animation_rate = 2;
+let bullet_velocity;
+let player_velocity;
+let player_velocity_x;
+let player_velocity_y;
+let mob_velocity;
+let spawn_rate;
 
-var score;
-var highscore = -1;
+let mob_skill;//#TODO
+let mob_smell;//#TODO
+let stink_matrix;
+let stink_dist;
 
-var m;//Map m;
-var p_player;//Player p;
-var mobs; //List<Mob> mobs = new List<Mob>();
-var bullets; //List<Bullet> bullets = new List<Bullet>();
+let current_trouble;
+let next_trouble;
 
-var bullets_trash = [];
-var mobs_trash = [];
-//var trouble_trash = [];
 
-var pressedKey = []; //HashSet<int> pressedKey = new HashSet<int>();
-var buttons = [];
+let score;
+let high_score = -1;
 
-var lose = false;
+let m;//Map m;
+let p_player;//Player p;
+let mobs; //List<Mob> mobs = new List<Mob>();
 
-var directions = [[0, -1], [1, 0], [0, 1], [-1, 0]];
-var tiles_pos_x; // i*tile_size
-var tiles_pos_y; // j*tile_size
-var corigate_x;// = 640 / 2 + tile_size/2;
-var corigate_y;// = 480 / 2 + tile_size/2;
-var corigate_bullet;// tile_size/2 - bullet_size/2
+let bullets; //List<Bullet> bullets = new List<Bullet>();
+let bullets_trash = [];
+let mobs_trash = [];
 
-var view_keret = 10;
-var view_width, view_height;
+//let trouble_trash = [];
+let pressedKey = []; //HashSet<int> pressedKey = new HashSet<int>();
 
-var info1;
-var info2;
-var info3;
+let buttons = [];
+
+let lose = false;
+let tiles_pos_x; // i*tile_size
+let tiles_pos_y; // j*tile_size
+let corigate_x;// = 640 / 2 + tile_size/2;
+let corigate_y;// = 480 / 2 + tile_size/2;
+let corigate_bullet;// tile_size/2 - bullet_size/2
+
+let view_frame = 10;
+let view_width, view_height;
+
+let info_score;
+let info_trouble;
+let info_high_score;
 
 //Images
 
@@ -156,7 +159,7 @@ function MyButton(x, y, numb){
     this.numb = numb;
 
     this.isInside = function(px, py){
-        return this.x <= px && px <= this.x + butsize && this.y <= py && py <= this.y + butsize;
+        return this.x <= px && px <= this.x + button_size && this.y <= py && py <= this.y + button_size;
     }
     this.draw = function(){
         if(pressedKey[numb]){
@@ -164,7 +167,7 @@ function MyButton(x, y, numb){
         }else{
             ctx.fillStyle = "#444444";
         }
-        ctx.fillRect(x,y,butsize,butsize);
+        ctx.fillRect(x,y,button_size,button_size);
     }
 }
 
@@ -173,42 +176,42 @@ function Map(w, h){
     this.width = w;
     this.height = h;
 
-    //Feltöltés 0ákkal
-    for (var i = 0; i < this.width; i++){
+    //Fill 0-s
+    for (let i = 0; i < this.width; i++){
         this.tiles[i] = [];
-        for (var j = 0; j < this.height; j++){
+        for (let j = 0; j < this.height; j++){
             this.tiles[i][j] = 0;
         }
     }
 
     //Random map:
-    for (var i = 0; i < this.width; i++)
+    for (let i = 0; i < this.width; i++)
     {
-        for (var j = 0; j < this.height; j++)
+        for (let j = 0; j < this.height; j++)
         {
-            //Ha nincs a közelben fal
-            if (Math.floor(Math.random()*100) < wall_rate && this.tiles[i][j] == 0 && i + 1 < this.width && this.tiles[i+1][j] == 0
-                && i-1 >= 0 && this.tiles[i-1][j] == 0 && this.tiles[i][j] == 0
-                && j + 1 < this.height && this.tiles[i][j+1] == 0 && j - 1 >= 0 && this.tiles[i][j-1] == 0
-                && this.tiles[i+1][j+1] == 0 && this.tiles[i+1][j-1] == 0
-                && this.tiles[i-1][j+1] == 0 && this.tiles[i-1][j-1] == 0)
+            //If no wall near
+            if (Math.floor(Math.random()*100) < wall_rate && this.tiles[i][j] === 0 && i + 1 < this.width && this.tiles[i+1][j] === 0
+                && i-1 >= 0 && this.tiles[i-1][j] === 0 && this.tiles[i][j] === 0
+                && j + 1 < this.height && this.tiles[i][j+1] === 0 && j - 1 >= 0 && this.tiles[i][j-1] === 0
+                && this.tiles[i+1][j+1] === 0 && this.tiles[i+1][j-1] === 0
+                && this.tiles[i-1][j+1] === 0 && this.tiles[i-1][j-1] === 0)
             {
-                var hossz = Math.floor(Math.random()*wall_max) + wall_min;
+                let length = Math.floor(Math.random()*wall_max) + wall_min;
 
-                //Vizszintes
-                if (Math.floor(Math.random()*2) == 0)
+                //Horizontal
+                if (Math.floor(Math.random()*2) === 0)
                 {
-                    for (var k = 0; k < hossz && i + k + 1 < this.width && this.tiles[i+k+1][j] != 1
-                    && this.tiles[i+k+1][j+1] != 1 && this.tiles[i+k+1][j-1] != 1; k++)
+                    for (let k = 0; k < length && i + k + 1 < this.width && this.tiles[i+k+1][j] !== 1
+                    && this.tiles[i+k+1][j+1] !== 1 && this.tiles[i+k+1][j-1] !== 1; k++)
                     {
                         this.tiles[i+k][j] = 1;
                     }
                 }
-                //Függőleges
+                //Vertical
                 else
                 {
-                    for (var k = 0; k < hossz && j + k + 1< this.height && this.tiles[i][j+k+1] != 1
-                    && this.tiles[i+1][j+k+1] != 1 && this.tiles[i-1][j+k+1] != 1; k++)
+                    for (let k = 0; k < length && j + k + 1< this.height && this.tiles[i][j+k+1] !== 1
+                    && this.tiles[i+1][j+k+1] !== 1 && this.tiles[i-1][j+k+1] !== 1; k++)
                     {
                         this.tiles[i][j+k] = 1;
                     }
@@ -224,16 +227,16 @@ function Map(w, h){
         this.tiles[i][j] = z;
     };
     this.empty = function(x, y){
-        return x >= 0 && y >= 0 && x < this.width && y < this.height && this.tiles[x][y] == 0;
+        return x >= 0 && y >= 0 && x < this.width && y < this.height && this.tiles[x][y] === 0;
     };
     this.draw = function(x, y){
         ctx.fillStyle = "#42240c";
         ctx.fillRect(0, 0, view_width, view_height);
 
-        for (var i = 0; i < this.width; i++){
-            for (var j = 0; j < this.height; j++)
+        for (let i = 0; i < this.width; i++){
+            for (let j = 0; j < this.height; j++)
             {
-                if(this.tiles[i][j] == 1){
+                if(this.tiles[i][j] === 1){
                     ctx.drawImage(crateImage, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
                     // ctx.fillStyle = "#FFFFFF";
                     // ctx.fillRect(tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
@@ -246,7 +249,7 @@ function Map(w, h){
     this.getWidth = function(){
         return this.width;
     };
-    this.getHeight = function(x, y){
+    this.getHeight = function(){
         return this.height;
     };
 }
@@ -264,11 +267,11 @@ function Player(kx, ky){
 
     this.direction = 0;
 
-    this.resize = function(ujmeret){
-        this.x = this.x / tile_size * ujmeret;
-        this.y = this.y / tile_size * ujmeret;
-        this.x2 = this.x + ujmeret;
-        this.y2 = this.y + ujmeret;
+    this.resize = function(new_size){
+        this.x = this.x / tile_size * new_size;
+        this.y = this.y / tile_size * new_size;
+        this.x2 = this.x + new_size;
+        this.y2 = this.y + new_size;
     };
 
     this.move = function(vx, vy){
@@ -281,13 +284,13 @@ function Player(kx, ky){
         this.ky = Math.floor(this.y / tile_size);
         this.ox = this.x + tile_size/2;
         this.oy = this.y + tile_size/2;
-        var tempx = Math.floor((this.x + tile_size/2) / tile_size);
-        var tempy = Math.floor((this.y + tile_size/2) / tile_size);
-        if(tempx != this.fx || tempy != this.fy){
-            this.fx = tempx;
-            this.fy = tempy;
-            buzles(new Point(tempx, tempy));
-            //setTimeout(function(){ buzles(new Point(tempx, tempy));}, 0);
+        let tmp_x = Math.floor((this.x + tile_size/2) / tile_size);
+        let tmp_y = Math.floor((this.y + tile_size/2) / tile_size);
+        if(tmp_x !== this.fx || tmp_y !== this.fy){
+            this.fx = tmp_x;
+            this.fy = tmp_y;
+            stinks(new Point(tmp_x, tmp_y));
+            //setTimeout(function(){ stinks(new Point(tmp_x, tmp_y));}, 0);
         }
     };
     this.stop = function(){
@@ -335,12 +338,6 @@ function Player(kx, ky){
     };
 
     this.draw = function(mx, my){
-        // ctx.fillStyle = "#00FF00";
-        // ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
-        // ctx.fillStyle = "#00FFFF";
-        // ctx.fillRect(tiles_pos_x[this.fx] - mx, tiles_pos_y[this.fy] - my, tile_size, tile_size);
-        // ctx.drawImage(arrows[this.direction], this.x - mx, this.y - my, tile_size, tile_size);
-
         ctx.drawImage(zombieImages[this.direction][this.walking ? anim_index : 1], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
@@ -412,9 +409,7 @@ function Mob(kx, ky, l){
     };
 
     this.draw = function(mx, my){
-        // ctx.fillStyle = "#FF0000";
         ctx.drawImage(zombieImages[this.direction][anim_index], this.x - mx, this.y - my, tile_size, tile_size);
-        // ctx.fillRect(this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
 function Bullet(x, y, kx, ky, direction){
@@ -502,22 +497,22 @@ function Trouble(name, duration, use, unuse){
 //     corigate_y = view_height / 2 - tile_size/2;
 //
 //     tiles_pos_x = [];
-//     for(var i=0; i < map_width; i++){
+//     for(let i=0; i < map_width; i++){
 //         tiles_pos_x[i] = i * tile_size;
 //     }
 //
 //     tiles_pos_y = [];
-//     for(var j=0; j < map_height; j++){
+//     for(let j=0; j < map_height; j++){
 //         tiles_pos_y[j] = j * tile_size;
 //     }
 //     corigate_bullet = tile_size/2 - bullet_size/2;
 // }
 // function corrigate(meret){
 //     p_player.resize(meret);
-//     for(var i=0; i < mobs.length; i++){
+//     for(let i=0; i < mobs.length; i++){
 //         mobs[i].resize(meret);
 //     }
-//     for(var i=0; i < bullets.length; i++){
+//     for(let i=0; i < bullets.length; i++){
 //         bullets[i].resize(meret);
 //     }
 // }
@@ -529,8 +524,8 @@ function newgame(){
     bullets = [];
     current_trouble = -1;
 
-    mobskill = 150;
-    spawn_rate = base_spawnrate;
+    mob_skill = 150;
+    spawn_rate = base_spawn_rate;
     stink_dist = base_stink_dist;
 
     score = 0;
@@ -546,12 +541,12 @@ function newgame(){
     corigate_y = view_height / 2 - tile_size/2;
 
     tiles_pos_x = [];
-    for(var i=0; i < map_width; i++){
+    for(let i=0; i < map_width; i++){
         tiles_pos_x[i] = i * tile_size;
     }
 
     tiles_pos_y = [];
-    for(var j=0; j < map_height; j++){
+    for(let j=0; j < map_height; j++){
         tiles_pos_y[j] = j * tile_size;
     }
     corigate_bullet = tile_size/2 - bullet_size/2;
@@ -561,52 +556,52 @@ function newgame(){
     m.set(map_width/2,map_height/2,0);
     p_player = new Player(map_width/2, map_height/2);
 
-    buzles(new Point(p_player.getFx(), p_player.getFy()));
+    stinks(new Point(p_player.getFx(), p_player.getFy()));
     next_trouble = Math.floor(Math.random()*trouble_def.length);
 }
-function resetSzagok(){
-    stinkd = [];
-    for(var i=0; i < map_width; i++){
-        stinkd[i] = [];
+function resetStinkMatrix(){
+    stink_matrix = [];
+    for(let i=0; i < map_width; i++){
+        stink_matrix[i] = [];
     }
 }
-function buzles(point){
-    resetSzagok();
+function stinks(point){
+    resetStinkMatrix();
 
-    var queue = [];
-    stinkd[point.x][point.y] = 0;
+    let queue = [];
+    stink_matrix[point.x][point.y] = 0;
     queue.push(point);
-    while(queue.length != 0){
-        var c_point = queue.shift();
-        if(m.empty(c_point.x+1, c_point.y) && stinkd[c_point.x+1][c_point.y] == undefined){
-            stinkd[c_point.x+1][c_point.y] = stinkd[c_point.x][c_point.y] + 1;
-            if(stinkd[c_point.x+1][c_point.y] < stink_dist){
+    while(queue.length !== 0){
+        let c_point = queue.shift();
+        if(m.empty(c_point.x+1, c_point.y) && stink_matrix[c_point.x+1][c_point.y] === undefined){
+            stink_matrix[c_point.x+1][c_point.y] = stink_matrix[c_point.x][c_point.y] + 1;
+            if(stink_matrix[c_point.x+1][c_point.y] < stink_dist){
                 queue.push(new Point(c_point.x+1, c_point.y));
             }
         }
-        if(m.empty(c_point.x-1, c_point.y) && stinkd[c_point.x-1][c_point.y] == undefined){
-            stinkd[c_point.x-1][c_point.y] = stinkd[c_point.x][c_point.y] + 1;
-            if(stinkd[c_point.x-1][c_point.y] < stink_dist){
+        if(m.empty(c_point.x-1, c_point.y) && stink_matrix[c_point.x-1][c_point.y] === undefined){
+            stink_matrix[c_point.x-1][c_point.y] = stink_matrix[c_point.x][c_point.y] + 1;
+            if(stink_matrix[c_point.x-1][c_point.y] < stink_dist){
                 queue.push(new Point(c_point.x-1, c_point.y));
             }
         }
-        if(m.empty(c_point.x, c_point.y+1) && stinkd[c_point.x][c_point.y+1] == undefined){
-            stinkd[c_point.x][c_point.y+1] = stinkd[c_point.x][c_point.y] + 1;
-            if(stinkd[c_point.x][c_point.y+1] < stink_dist){
+        if(m.empty(c_point.x, c_point.y+1) && stink_matrix[c_point.x][c_point.y+1] === undefined){
+            stink_matrix[c_point.x][c_point.y+1] = stink_matrix[c_point.x][c_point.y] + 1;
+            if(stink_matrix[c_point.x][c_point.y+1] < stink_dist){
                 queue.push(new Point(c_point.x, c_point.y+1));
             }
         }
-        if(m.empty(c_point.x, c_point.y-1) && stinkd[c_point.x][c_point.y-1] == undefined){
-            stinkd[c_point.x][c_point.y-1] = stinkd[c_point.x][c_point.y] + 1;
-            if(stinkd[c_point.x][c_point.y-1] < stink_dist){
+        if(m.empty(c_point.x, c_point.y-1) && stink_matrix[c_point.x][c_point.y-1] === undefined){
+            stink_matrix[c_point.x][c_point.y-1] = stink_matrix[c_point.x][c_point.y] + 1;
+            if(stink_matrix[c_point.x][c_point.y-1] < stink_dist){
                 queue.push(new Point(c_point.x, c_point.y-1));
             }
         }
     }
 }
 
-function utkozoMob(x, y){
-    for (var i = 0; i < mobs.length; i++)
+function mobCollide(x, y){
+    for (let i = 0; i < mobs.length; i++)
     {
         if (mobs[i].isInside(x, y)/* ||
 	                    mobs[i].isInside(x2, y) ||
@@ -617,16 +612,16 @@ function utkozoMob(x, y){
     }
     return -1;
 }
-function utkozoPlayer(m){
-    /*var left_top = m.isInside(p_player.getX(), p_player.getY());
-    var right_top = m.isInside(p_player.getX2(), p_player.getY());
-    var right_bot = m.isInside(p_player.getX2(), p_player.getY2());
-    var left_bot = m.isInside(p_player.getX(), p_player.getY2());
+function playerCollide(m){
+    /*let left_top = m.isInside(p_player.getX(), p_player.getY());
+    let right_top = m.isInside(p_player.getX2(), p_player.getY());
+    let right_bot = m.isInside(p_player.getX2(), p_player.getY2());
+    let left_bot = m.isInside(p_player.getX(), p_player.getY2());
 
-    if(p_player.getX() % tile_size == 0){
+    if(p_player.getX() % tile_size === 0){
 
     }
-    var left_right =
+    let left_right =
 
     return (left_top && right_top ||
             right_top && right_bot ||
@@ -647,9 +642,9 @@ function turn(direction){
 }
 
 function mob_level0(x, y){
-    var ujx, ujy, opt = [];
+    let ujx, ujy, opt = [];
 
-    for(var i=0; i < 4; i++){
+    for(let i=0; i < 4; i++){
         ujx = x + directions[i][0];
         ujy = y + directions[i][1];
         if(m.empty(ujx, ujy)){
@@ -660,12 +655,12 @@ function mob_level0(x, y){
     return opt[Math.floor(Math.random()*opt.length)];
 }
 function mob_level1(x, y, direction){
+    let temp = Math.random();
 
-    var temp = Math.random();
     if(temp <= 0.75){
-        var ujx = x + directions[direction][0];
-        var ujy = y + directions[direction][1];
-        if(m.empty(ujx, ujy)){
+        let new_x = x + directions[direction][0];
+        let new_y = y + directions[direction][1];
+        if(m.empty(new_x, new_y)){
             return direction;
         }else{
             if(temp <= 0.3){
@@ -680,9 +675,9 @@ function mob_level1(x, y, direction){
     }else
     if(temp <= 0.85){
         direction = left(direction);
-        var ujx = x + directions[direction][0];
-        var ujy = y + directions[direction][1];
-        if(m.empty(ujx, ujy)){
+        let new_x = x + directions[direction][0];
+        let new_y = y + directions[direction][1];
+        if(m.empty(new_x, new_y)){
             return direction;
         }else{
             if(temp <= 0.8){
@@ -694,9 +689,9 @@ function mob_level1(x, y, direction){
     }else
     if(temp <= 0.95){
         direction = right(direction);
-        var ujx = x + directions[direction][0];
-        var ujy = y + directions[direction][1];
-        if(m.empty(ujx, ujy)){
+        let new_x = x + directions[direction][0];
+        let new_y = y + directions[direction][1];
+        if(m.empty(new_x, new_y)){
             return direction;
         }else{
             if(temp <= 0.9){
@@ -707,9 +702,9 @@ function mob_level1(x, y, direction){
         }
     }else{
         direction = turn(direction);
-        var ujx = x + directions[direction][0];
-        var ujy = y + directions[direction][1];
-        if(m.empty(ujx, ujy)){
+        let new_x = x + directions[direction][0];
+        let new_y = y + directions[direction][1];
+        if(m.empty(new_x, new_y)){
             return direction;
         }else{
             if(temp <= 0.975){
@@ -721,11 +716,11 @@ function mob_level1(x, y, direction){
     }
 }
 function mob_level2(x, y){
-    var options = [];
-    for(var i=0; i < 4; i++){
-        var newx = x + directions[i][0];
-        var newy = y + directions[i][1];
-        if(m.empty(newx, newy) && stinkd[newx][newy] < stinkd[x][y]){
+    let options = [];
+    for(let i=0; i < 4; i++){
+        let new_x = x + directions[i][0];
+        let new_y = y + directions[i][1];
+        if(m.empty(new_x, new_y) && stink_matrix[new_x][new_y] < stink_matrix[x][y]){
             options.push(i);
         }
     }
@@ -734,12 +729,12 @@ function mob_level2(x, y){
 }
 
 function tryToMobMove(mob){
-    if(utkozoPlayer(mob)){
+    if(playerCollide(mob)){
         lose = true;
         return false;
     }
 
-    if(mob.getX() % tile_size == 0 && mob.getY() % tile_size == 0){
+    if(mob.getX() % tile_size === 0 && mob.getY() % tile_size === 0){
         //#FRENZY!!
         if(fast_active){
             mob.v = tile_size / fast_scale;
@@ -748,23 +743,23 @@ function tryToMobMove(mob){
         }
 
 
-        if(mob.getLevel() == 0){
+        if(mob.getLevel() === 0){
             mob.setDirection(mob_level0(mob.getKx(), mob.getKy()));
             mob.setLevel(1);
         }else
             //1. 75% straight 10 % left 10% right 5% turn
-        if(mob.getLevel() == 1){
+        if(mob.getLevel() === 1){
             mob.setDirection(mob_level1(mob.getKx(), mob.getKy(), mob.getDirection()));
-            if(stinkd[mob.getKx()][mob.getKy()] != undefined){
+            if(stink_matrix[mob.getKx()][mob.getKy()] !== undefined){
                 if(Math.random() <= 0.3){
                     mob.setDirection(mob_level2(mob.getKx(), mob.getKy()));
                     mob.setLevel(2);
                 }
             }
         }else
-            //2. Szaglás után megy 20%ban elveszti a szagot
-        if(mob.getLevel() == 2){
-            if(stinkd[mob.getKx()][mob.getKy()] != undefined){
+            //2. Goes after the smell 20% to lose track
+        if(mob.getLevel() === 2){
+            if(stink_matrix[mob.getKx()][mob.getKy()] !== undefined){
                 mob.setDirection(mob_level2(mob.getKx(), mob.getKy()));
                 if(Math.random() <= 0.2){//#TODO TÁVOLSÁGARÁNYOSAN FELEJTSEN SZAGOT
                     mob.setDirection(mob_level1(mob.getKx(), mob.getKy(), mob.getDirection()));
@@ -776,37 +771,37 @@ function tryToMobMove(mob){
         }
     }
 
-    var vx = directions[mob.getDirection()][0];
-    var vy = directions[mob.getDirection()][1];
+    let vx = directions[mob.getDirection()][0];
+    let vy = directions[mob.getDirection()][1];
 
     mob.move(vx * mob.v, vy * mob.v);
     return true;
 }
-function tryToBulletMove(b){
-    var vx = directions[b.getDirection()][0];
-    var vy = directions[b.getDirection()][1];
+function tryToMoveBullet(b){
+    let vx = directions[b.getDirection()][0];
+    let vy = directions[b.getDirection()][1];
 
-    var ujx;
-    var ujy;
+    let new_x;
+    let new_y;
     if (vx < 0 || vy < 0)
     {
-        ujx = b.getKx();
-        ujy = b.getKy();
-        if (b.getX() % tile_size == 0)
-            ujx += vx;
-        if (b.getY() % tile_size == 0)
-            ujy += vy;
+        new_x = b.getKx();
+        new_y = b.getKy();
+        if (b.getX() % tile_size === 0)
+            new_x += vx;
+        if (b.getY() % tile_size === 0)
+            new_y += vy;
     } else {
-        ujx = b.getKx() + vx;
-        ujy = b.getKy() + vy;
+        new_x = b.getKx() + vx;
+        new_y = b.getKy() + vy;
     }
-    var index;
-    if ((index = utkozoMob(b.getOx(), b.getOy())) != -1){
+    let index;
+    if ((index = mobCollide(b.getOx(), b.getOy())) !== -1){
         mobs_trash.push(index);
         score += 50;
         return false;
     }
-    if (m.empty(ujx, ujy))
+    if (m.empty(new_x, new_y))
     {
         b.move();
         return true;
@@ -814,66 +809,66 @@ function tryToBulletMove(b){
     return false;
 }
 
-function tryToPlayerMove(p, direction){
-    //Írány beállítása
+function tryToMovePlayer(p, direction){
+    //Setting direction
     p.setDirection(direction);
-    var vx = directions[direction][0];
-    var vy = directions[direction][1];
+    let vx = directions[direction][0];
+    let vy = directions[direction][1];
 
-    var ujx;
-    var ujy;
+    let new_x;
+    let new_y;
     if (vx < 0 || vy < 0)
     {
-        ujx = p.getKx();
-        ujy = p.getKy();
-        if (p.getX() % tile_size == 0)
-            ujx += vx;
-        if (p.getY() % tile_size == 0)
-            ujy += vy;
+        new_x = p.getKx();
+        new_y = p.getKy();
+        if (p.getX() % tile_size === 0)
+            new_x += vx;
+        if (p.getY() % tile_size === 0)
+            new_y += vy;
     } else {
-        ujx = p.getKx() + vx;
-        ujy = p.getKy() + vy;
+        new_x = p.getKx() + vx;
+        new_y = p.getKy() + vy;
     }
 
-    if(p.getX() % tile_size == 0){
+    if(p.getX() % tile_size === 0){
         player_velocity_x = player_velocity;
     }
-    if(p.getY() % tile_size == 0){
+    if(p.getY() % tile_size === 0){
         player_velocity_y = player_velocity;
     }
 
-    var index;
+    let index;
 
-    if ((index = utkozoMob(p.getOx(), p.getOy())) != -1){
+    if ((index = mobCollide(p.getOx(), p.getOy())) !== -1){
         lose = true;
         return false;
     }
-    if (m.empty(ujx, ujy))
+    if (m.empty(new_x, new_y))
     {
 
-        if (vy != 0)
+        if (vy !== 0)
         {
-            if (p.getX() % tile_size == 0)
+            if (p.getX() % tile_size === 0)
             {
                 p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
             else
-            if (m.empty(ujx + 1, ujy))
+            if (m.empty(new_x + 1, new_y))
             {
                 p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
         }
-        else//if (vx != 0)
+        else//if (vx !==0)
         {
-            if (p.getY() % tile_size == 0)
+            if (p.getY() % tile_size === 0)
             {
                 p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
             }
             else
-            if (m.empty(ujx, ujy + 1))
+            if (m.empty(new_x, new_y + 1))
             {
                 p.move(vx * player_velocity_x, vy * player_velocity_y);
                 return true;
@@ -896,8 +891,8 @@ function refresh(){
 
 function init(){
     c = document.getElementById("surface");
-    view_width = c.width = window.innerWidth - view_keret;
-    view_height = c.height = window.innerHeight - view_keret;
+    view_width = c.width = window.innerWidth - view_frame;
+    view_height = c.height = window.innerHeight - view_frame;
     ctx = c.getContext("2d");
     ctx.font="30px Verdana";
     //c.addEventListener("mousedown", doMouseDown, false);
@@ -918,10 +913,10 @@ function init(){
 
 function doMouseDown(event){
     //alert("x: "+event.pageX+" y:" + event.pageY);
-    for(var i=0; i < 5; i++){
+    for(let i=0; i < 5; i++){
         if(buttons[i].isInside(event.pageX, event.pageY)){
             pressedKey[i] = true;
-            if(i == 4){
+            if(i === 4){
                 lo(p_player);
             }
         }
@@ -929,7 +924,7 @@ function doMouseDown(event){
 }
 
 function doMouseUp(event){
-    for(var i=0; i < 5; i++){
+    for(let i=0; i < 5; i++){
         if(buttons[i].isInside(event.pageX, event.pageY)){
             pressedKey[i] = false;
         }
@@ -937,7 +932,7 @@ function doMouseUp(event){
 }
 
 function doKeyDown(event){
-    var code;
+    let code;
     //Keycode deprecated
     if (event.key !== undefined) {
         code = event.key;
@@ -986,7 +981,7 @@ function doKeyDown(event){
     }
 }
 function doKeyUp(event){
-    var code;
+    let code;
     //Keycode deprecated
     if (event.key !== undefined) {
         code = event.key;
@@ -1036,19 +1031,19 @@ function doKeyUp(event){
 
 trouble_def = [];
 trouble_def[0] = new Trouble("Explosion", -1, function(){
-    var tolx = Math.max(p_player.getFx() - explosion_size, 0);
-    var toly =  Math.max(p_player.getFy() - explosion_size, 0);
+    let from_x = Math.max(p_player.getFx() - explosion_size, 0);
+    let from_y =  Math.max(p_player.getFy() - explosion_size, 0);
 
-    var igx = Math.min(p_player.getFx() + explosion_size + 1, m.getWidth());
-    var igy = Math.min(p_player.getFy() + explosion_size + 1, m.getHeight());
+    let to_x = Math.min(p_player.getFx() + explosion_size + 1, m.getWidth());
+    let to_y = Math.min(p_player.getFy() + explosion_size + 1, m.getHeight());
 
-    for (var i = tolx; i < igx; i++){
-        for (var j = toly; j < igy; j++){
+    for (let i = from_x; i < to_x; i++){
+        for (let j = from_y; j < to_y; j++){
             m.set(i, j, 0);
         }
     }
 
-    buzles(new Point(p_player.getFx(), p_player.getFy()));
+    stinks(new Point(p_player.getFx(), p_player.getFy()));
 }, function(){
     //NO NEED
 });
@@ -1070,10 +1065,10 @@ trouble_def[3] = new Trouble("Unarmed", unarmed_duration, function(){
 });
 trouble_def[4] = new Trouble("Stinky", stinky_duration, function(){
     stink_dist = base_stink_dist * stinky_scale;
-    buzles(new Point(p_player.getFx(), p_player.getFy()));
+    stinks(new Point(p_player.getFx(), p_player.getFy()));
 }, function(){
     stink_dist = base_stink_dist;
-    buzles(new Point(p_player.getFx(), p_player.getFy()));
+    stinks(new Point(p_player.getFx(), p_player.getFy()));
 });
 trouble_def[5] = new Trouble("Reverse control", reverse_duration, function(){
     reverse_active = true;
@@ -1087,7 +1082,7 @@ trouble_def[6] = new Trouble("Blackout", blackout_duration, function(){
 });
 // #TODO Not working as intended
 // trouble_def[7] = new Trouble("Shortview", zoom_duration, function(){
-//     var ujmeret = base_size * zoom_size;
+//     let ujmeret = base_size * zoom_size;
 //     corrigate(ujmeret);
 //     set_meret(ujmeret);
 // }, function(){
@@ -1095,7 +1090,6 @@ trouble_def[6] = new Trouble("Blackout", blackout_duration, function(){
 //     set_meret(base_size);
 // });
 function add_trouble(sz){
-    //TODO KIIRJA HOGY MILYEN SZIVATAS
     sz.use();
     if(sz.duration > 0){
         current_trouble = sz;
@@ -1105,29 +1099,29 @@ function add_trouble(sz){
 }
 
 function runGame(){
-    //átméretezés sztem gépen kívül sehol nem fogják játék közben
-    if(view_width != window.innerWidth-view_keret || view_height != window.innerHeight-view_keret){
+    //Resize only used on desktop probably
+    if(view_width !== window.innerWidth-view_frame || view_height !== window.innerHeight-view_frame){
         view_width = c.width = window.innerWidth-20;
         view_height = c.height = window.innerHeight-20;
         corigate_x = view_width / 2 - tile_size/2;
         corigate_y = view_height / 2 - tile_size/2;
     }
 
-    if (timer % tick == 0){
+    if (timer % tick === 0){
         score+=5;
-        mobskill++;
+        mob_skill++;
         spawn_rate += 10;
-        if(current_trouble != -1){
+        if(current_trouble !== -1){
             if(current_trouble.duration > 0){
                 current_trouble.duration--;
-            } else { // if(current_trouble.duration == 0)
+            } else { // if(current_trouble.duration === 0)
                 current_trouble.unuse();
                 current_trouble = -1;
             }
         }
     }
-    //Szivatás
-    if (timer % trouble_rate == 0){
+    //Incident
+    if (timer % trouble_rate === 0){
         add_trouble(new Trouble(trouble_def[next_trouble].name,
             trouble_def[next_trouble].duration,
             trouble_def[next_trouble].use,
@@ -1135,22 +1129,22 @@ function runGame(){
 
         next_trouble = Math.floor(Math.random()*trouble_def.length);
     }
-    if (timer % animation_rate == 0) {
+    if (timer % animation_rate === 0) {
         anim_index = (anim_index + 1) % 3
     }
 
-    var move = false;
+    let move = false;
     if(reverse_active){
-        for(var i=0; i < 4; i++){
+        for(let i=0; i < 4; i++){
             if(pressedKey[i]){
-                tryToPlayerMove(p_player, turn(i));
+                tryToMovePlayer(p_player, turn(i));
                 move = true;
             }
         }
     } else {
-        for(var i=0; i < 4; i++){
+        for(let i=0; i < 4; i++){
             if(pressedKey[i]){
-                tryToPlayerMove(p_player, i);
+                tryToMovePlayer(p_player, i);
                 move = true;
             }
         }
@@ -1159,16 +1153,16 @@ function runGame(){
         p_player.stop();
     }
 
-    for(var i=0; i < bullets.length; i++){
-        if (!tryToBulletMove(bullets[i])){
+    for(let i=0; i < bullets.length; i++){
+        if (!tryToMoveBullet(bullets[i])){
             bullets_trash.push(i);
         }
     }
 
-    for(var i=0; i < mobs.length; i++){
+    for(let i=0; i < mobs.length; i++){
         tryToMobMove(mobs[i]);
     }
-    //TÖRLÉSEK
+    //Deletes
     while(bullets_trash.length){
         bullets.splice(bullets_trash.pop(), 1);
     }
@@ -1197,35 +1191,35 @@ function runGame(){
     if (lose)
     {
         //#TODO LOSE
-        if (score > highscore) {
-            highscore = score;
+        if (score > high_score) {
+            high_score = score;
         }
 
-        if(current_trouble != -1){
+        if(current_trouble !== -1){
             current_trouble.unuse();
         }
 
         newgame();
     }
 
-    info3 = "Highscore: " + ((highscore === -1) ? "-" : highscore);
-    var mennyi = (trouble_rate - timer % trouble_rate) / 10;
-    info2 = trouble_def[next_trouble].name+": " + mennyi;
-    info1 = "Score: " + score;
+    info_high_score = "High score: " + ((high_score === -1) ? "-" : high_score);
+    let left_time = (trouble_rate - timer % trouble_rate) / 10;
+    info_trouble = trouble_def[next_trouble].name+": " + left_time;
+    info_score = "Score: " + score;
     timer++;
 }
 function drawMainGame(){
-    var mx = p_player.getX() - corigate_x;
-    var my = p_player.getY() - corigate_y;
+    let mx = p_player.getX() - corigate_x;
+    let my = p_player.getY() - corigate_y;
     m.draw(mx, my, tile_size);
     p_player.draw(mx, my);
 
 
-    for(var i=0; i < mobs.length; i++){
+    for(let i=0; i < mobs.length; i++){
         mobs[i].draw(mx, my);
     }
 
-    for(var i=0; i < bullets.length; i++){
+    for(let i=0; i < bullets.length; i++){
         bullets[i].draw(mx, my);
     }
 }
@@ -1234,15 +1228,12 @@ function drawGame(){
     refresh();
 
     if(blackout_active){
-        if(blackout_is_dark){
-            if(timer % blackout_night == 0){
-                blackout_is_dark = !blackout_is_dark;
-            }
+        if(timer % blackout_night === 0){
+            blackout_is_light = !blackout_is_light;
+        }
+        if(blackout_is_light){
             drawMainGame();
         } else {
-            if(timer % blackout_night == 0){
-                blackout_is_dark = !blackout_is_dark;
-            }
             ctx.fillStyle = "#000000";
             ctx.fillRect(0, 0, view_width, view_height);
         }
@@ -1253,9 +1244,9 @@ function drawGame(){
 
     ctx.fillStyle = "#f0ece3";
     ctx.font = "34px Georgia";
-    ctx.fillText(info1, 50, 50);
-    ctx.fillText(info2, 400, 50);
-    ctx.fillText(info3, 800, 50);
+    ctx.fillText(info_score, 50, 50);
+    ctx.fillText(info_trouble, 400, 50);
+    ctx.fillText(info_high_score, 800, 50);
 
 
     if(current_trouble.duration > 0) {
