@@ -913,9 +913,6 @@ function init(){
     buttons[3] = new MyButton(50,400, 3);
     buttons[4] = new MyButton(550,400, 4);
 
-    //TODO KÉPEK
-
-
     newgame();
 }
 
@@ -940,23 +937,47 @@ function doMouseUp(event){
 }
 
 function doKeyDown(event){
-    switch (event.keyCode){
+    var code;
+    //Keycode deprecated
+    if (event.key !== undefined) {
+        code = event.key;
+    } else if (event.keyIdentifier !== undefined) {
+        code = event.keyIdentifier;
+    } else if (event.keyCode !== undefined) {
+        code = event.keyCode;
+    }
+
+    switch (code){
+        case 'w':
+        case 'Up':
+        case 'ArrowUp':
         case 87:
         case 38:
             pressedKey[0] = true;
             break;
+        case 'a':
+        case 'Left':
+        case 'ArrowLeft':
         case 65:
         case 37:
             pressedKey[3] = true;
             break;
+        case 's':
+        case 'Down':
+        case 'ArrowDown':
         case 83:
         case 40:
             pressedKey[2] = true;
             break;
+        case 'd':
+        case 'Right':
+        case 'ArrowRight':
         case 68:
         case 39:
             pressedKey[1] = true;
             break;
+        case ' ':
+        case 'x':
         case 32:
         case 88:
             pressedKey[4] = true;
@@ -965,23 +986,47 @@ function doKeyDown(event){
     }
 }
 function doKeyUp(event){
-    switch (event.keyCode){
+    var code;
+    //Keycode deprecated
+    if (event.key !== undefined) {
+        code = event.key;
+    } else if (event.keyIdentifier !== undefined) {
+        code = event.keyIdentifier;
+    } else if (event.keyCode !== undefined) {
+        code = event.keyCode;
+    }
+
+    switch (code){
+        case 'w':
+        case 'Up':
+        case 'ArrowUp':
         case 87:
         case 38:
             pressedKey[0] = false;
             break;
+        case 'a':
+        case 'Left':
+        case 'ArrowLeft':
         case 65:
         case 37:
             pressedKey[3] = false;
             break;
+        case 's':
+        case 'Down':
+        case 'ArrowDown':
         case 83:
         case 40:
             pressedKey[2] = false;
             break;
+        case 'd':
+        case 'Right':
+        case 'ArrowRight':
         case 68:
         case 39:
             pressedKey[1] = false;
             break;
+        case ' ':
+        case 'x':
         case 32:
         case 88:
             pressedKey[4] = false;
