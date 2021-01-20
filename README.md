@@ -7,7 +7,7 @@ that makes everything harder. Enemies use
 to find path to get to you.
 
 <p float="left">
-    <img src="https://github.com/neczpal/zombie-survival/raw/master/res/screenshot.png" width="400" />
+    <img src="https://github.com/neczpal/zombie-survival/raw/master/res/screenshot.png" width="600" />
 </p>
 
 ## Play 
