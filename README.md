@@ -6,6 +6,10 @@ that makes everything harder. Enemies use
 [BRS](https://en.wikipedia.org/wiki/Breadth-first_search)
 to find path to get to you.
 
+<p float="left">
+    <img src="https://github.com/neczpal/zombie-survival/raw/master/res/screenshots.png" width="400" />
+</p>
+
 ## Play 
 
 ### Objective
