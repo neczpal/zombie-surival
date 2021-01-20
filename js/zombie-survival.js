@@ -84,60 +84,38 @@ let info_high_score;
 
 //Images
 
-const crateImage = new Image (256, 256);
-crateImage.src = './res/crate.png';
+function loadImage (resourceName, width, height) {
+    let img = new Image (width, height);
+    img.src = './res/' + resourceName + '.png';
 
-const floorImage = new Image (345, 345);
-floorImage.src = './res/floor.jpg';
+    return img;
+}
 
-const bulletRightImage = new Image (128, 128);
-bulletRightImage.src = './res/bullet_right.png';
-const bulletTopImage = new Image (128, 128);
-bulletTopImage.src = './res/bullet_top.png';
-const bulletLeftImage = new Image (128, 128);
-bulletLeftImage.src = './res/bullet_left.png';
-const bulletBotImage = new Image (128, 128);
-bulletBotImage.src = './res/bullet_bot.png';
+function load4DirectionalImage (resourceName, width, height, index = -1) {
+    let imgs = [];
 
-const bulletImages = [bulletTopImage, bulletRightImage, bulletBotImage, bulletLeftImage];
+    imgs.push (loadImage (resourceName + "_top" + (index === -1 ? "" : "_" + index), width, height));
+    imgs.push (loadImage (resourceName + "_right" + (index === -1 ? "" : "_" + index), width, height));
+    imgs.push (loadImage (resourceName + "_bot" + (index === -1 ? "" : "_" + index), width, height));
+    imgs.push (loadImage (resourceName + "_left" + (index === -1 ? "" : "_" + index), width, height));
 
-const zombieRightImage1 = new Image (74, 74);
-zombieRightImage1.src = './res/zombie_right_1.png';
-const zombieRightImage2 = new Image (74, 74);
-zombieRightImage2.src = './res/zombie_right_2.png';
-const zombieRightImage3 = new Image (74, 74);
-zombieRightImage3.src = './res/zombie_right_3.png';
+    return imgs;
+}
 
-const zombieRightImages = [zombieRightImage1, zombieRightImage2, zombieRightImage3];
+function loadCharacterImages (resourceName, frames, width, height) {
+    let imgs = [];
 
-const zombieLeftImage1 = new Image (74, 74);
-zombieLeftImage1.src = './res/zombie_left_1.png';
-const zombieLeftImage2 = new Image (74, 74);
-zombieLeftImage2.src = './res/zombie_left_2.png';
-const zombieLeftImage3 = new Image (74, 74);
-zombieLeftImage3.src = './res/zombie_left_3.png';
+    for (let i = 0; i < frames; i++) {
+        imgs.push (load4DirectionalImage (resourceName, width, height, (i + 1)));
+    }
 
-const zombieLeftImages = [zombieLeftImage1, zombieLeftImage2, zombieLeftImage3];
+    return imgs;
+}
 
-const zombieTopImage1 = new Image (74, 74);
-zombieTopImage1.src = './res/zombie_top_1.png';
-const zombieTopImage2 = new Image (74, 74);
-zombieTopImage2.src = './res/zombie_top_2.png';
-const zombieTopImage3 = new Image (74, 74);
-zombieTopImage3.src = './res/zombie_top_3.png';
-
-const zombieTopImages = [zombieTopImage1, zombieTopImage2, zombieTopImage3];
-
-const zombieBotImage1 = new Image (74, 74);
-zombieBotImage1.src = './res/zombie_bot_1.png';
-const zombieBotImage2 = new Image (74, 74);
-zombieBotImage2.src = './res/zombie_bot_2.png';
-const zombieBotImage3 = new Image (74, 74);
-zombieBotImage3.src = './res/zombie_bot_3.png';
-
-const zombieBotImages = [zombieBotImage1, zombieBotImage2, zombieBotImage3];
-
-const zombieImages = [zombieTopImages, zombieRightImages, zombieBotImages, zombieLeftImages];
+const crateImage = loadImage ("crate", 256, 256);
+const floorImage = loadImage ("floor", 345, 345);
+const bulletImages = load4DirectionalImage ("bullet", 128, 128);
+const zombieImages = loadCharacterImages ("zombie", 3, 74, 74);
 
 function extend (child, parent) {
     child.prototype = parent.prototype;
@@ -322,10 +300,11 @@ function Player (kx, ky) {
     };
 
     this.draw = function (mx, my) {
-        ctx.drawImage (zombieImages[this.direction][this.walking ? anim_index : 1], this.x - mx, this.y - my, tile_size, tile_size);
+        ctx.drawImage (zombieImages[this.walking ? anim_index : 1][this.direction], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
-extend(Player, GameObject);
+
+extend (Player, GameObject);
 
 function Mob (kx, ky, lev) {
     GameObject.call (this, kx, ky, kx * tile_size, ky * tile_size);
@@ -340,10 +319,11 @@ function Mob (kx, ky, lev) {
     };
 
     this.draw = function (mx, my) {
-        ctx.drawImage (zombieImages[this.direction][anim_index], this.x - mx, this.y - my, tile_size, tile_size);
+        ctx.drawImage (zombieImages[anim_index][this.direction], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
-extend(Mob, GameObject);
+
+extend (Mob, GameObject);
 
 function Bullet (x, y, kx, ky, direction) {
     GameObject.call (this, kx, ky, x + corrected_bullet, y + corrected_bullet);
@@ -365,7 +345,8 @@ function Bullet (x, y, kx, ky, direction) {
         ctx.drawImage (bulletImages[direction], this.x - mx, this.y - my, bullet_size, bullet_size);
     };
 }
-extend(Bullet, GameObject);
+
+extend (Bullet, GameObject);
 
 function Trouble (name, duration, use, undo_use) {
     this.name = name;
