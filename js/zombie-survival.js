@@ -216,28 +216,67 @@ function Map (w, h) {
     };
 }
 
-function Player (kx, ky) {
+function GameObject(kx, ky, x, y) {
     this.kx = kx;
     this.ky = ky;
-    this.x = kx * tile_size;
-    this.y = ky * tile_size;
+    this.x = x;//kx * tile_size;
+    this.y = y;//ky * tile_size;
     this.x2 = this.x + tile_size;
     this.y2 = this.y + tile_size;
     this.ox = this.x + tile_size / 2;
     this.oy = this.y + tile_size / 2;
-    this.fx = Math.floor ((this.x + tile_size / 2) / tile_size);
-    this.fy = Math.floor ((this.y + tile_size / 2) / tile_size);
 
     this.direction = 0;
 
-    this.resize = function (new_size) {
+}
+
+GameObject.prototype = {
+    resize: function (new_size) {
         this.x = this.x / tile_size * new_size;
         this.y = this.y / tile_size * new_size;
         this.x2 = this.x + new_size;
         this.y2 = this.y + new_size;
-    };
+    },
 
-    this.move = function (vx, vy) {
+    stop: function () {
+        this.walking = false;
+    },
+
+    isInside: function (px, py) {
+        return this.x <= px && px <= this.x2 && this.y <= py && py <= this.y2;
+    },
+
+    getOx: function () {
+        return this.ox;
+    },
+    getOy: function () {
+        return this.oy;
+    },
+    getKx: function () {
+        return this.kx;
+    },
+    getKy: function () {
+        return this.ky;
+    },
+    getX: function () {
+        return this.x;
+    },
+    getY: function () {
+        return this.y;
+    },
+    getX2: function () {
+        return this.x2;
+    },
+    getY2: function () {
+        return this.y2;
+    },
+    getDirection: function () {
+        return this.direction;
+    },
+    setDirection: function (dir) {
+        this.direction = dir;
+    },
+    move: function (vx, vy) {
         this.walking = true;
         this.x = this.x + vx;
         this.y = this.y + vy;
@@ -247,56 +286,33 @@ function Player (kx, ky) {
         this.ky = Math.floor (this.y / tile_size);
         this.ox = this.x + tile_size / 2;
         this.oy = this.y + tile_size / 2;
+    }
+}
+
+function Player (kx, ky) {
+    GameObject.call(this, kx, ky, kx * tile_size, ky * tile_size);
+
+    this.fx = Math.floor ((this.x + tile_size / 2) / tile_size);
+    this.fy = Math.floor ((this.y + tile_size / 2) / tile_size);
+
+    this.move = function (vx, vy) {
+        GameObject.prototype.move.call(this, vx, vy);
+
         let tmp_x = Math.floor ((this.x + tile_size / 2) / tile_size);
         let tmp_y = Math.floor ((this.y + tile_size / 2) / tile_size);
+
         if (tmp_x !== this.fx || tmp_y !== this.fy) {
             this.fx = tmp_x;
             this.fy = tmp_y;
             stinks (new Point (tmp_x, tmp_y));
         }
     };
-    this.stop = function () {
-        this.walking = false;
-    };
 
-    this.isInside = function (px, py) {
-        return this.x <= px && px <= this.x2 && this.y <= py && py <= this.y2;
-    };
-    this.getOx = function () {
-        return this.ox;
-    };
-    this.getOy = function () {
-        return this.oy;
-    };
     this.getFx = function () {
         return this.fx;
     };
     this.getFy = function () {
         return this.fy;
-    };
-    this.getKx = function () {
-        return this.kx;
-    };
-    this.getKy = function () {
-        return this.ky;
-    };
-    this.getX = function () {
-        return this.x;
-    };
-    this.getY = function () {
-        return this.y;
-    };
-    this.getX2 = function () {
-        return this.x2;
-    };
-    this.getY2 = function () {
-        return this.y2;
-    };
-    this.getDirection = function () {
-        return this.direction;
-    };
-    this.setDirection = function (dir) {
-        this.direction = dir;
     };
 
     this.draw = function (mx, my) {
@@ -304,66 +320,15 @@ function Player (kx, ky) {
     };
 }
 
-function Mob (kx, ky, l) {
-    this.kx = kx;
-    this.ky = ky;
-    this.x = kx * tile_size;
-    this.y = ky * tile_size;
-    this.x2 = this.x + tile_size;
-    this.y2 = this.y + tile_size;
-    this.level = l;
-    this.v = mob_velocity;
-    this.direction = 0;
+Player.prototype = GameObject.prototype;
+Player.prototype = new GameObject();
+Player.prototype.constructor = Player;
 
-    this.resize = function (new_size) {
-        this.x = this.x / tile_size * new_size;
-        this.y = this.y / tile_size * new_size;
-        this.x2 = this.x + new_size;
-        this.y2 = this.y + new_size;
-    };
+function Mob (kx, ky, lev) {
+    GameObject.call(this, kx, ky, kx * tile_size, ky * tile_size);
 
-    this.move = function (vx, vy) {
-        this.walking = true;
-        this.x = this.x + vx;
-        this.y = this.y + vy;
-        this.x2 = this.x + tile_size;
-        this.y2 = this.y + tile_size;
-        this.kx = Math.floor (this.x / tile_size);
-        this.ky = Math.floor (this.y / tile_size);
-    };
-    this.stop = function () {
-        this.walking = false;
-    };
+    this.level = lev;
 
-    this.isInside = function (px, py) {
-        return this.x <= px && px <= this.x2 && this.y <= py && py <= this.y2;
-    };
-
-    this.getKx = function () {
-        return this.kx;
-    };
-    this.getKy = function () {
-        return this.ky;
-    };
-
-    this.getX = function () {
-        return this.x;
-    };
-    this.getY = function () {
-        return this.y;
-    };
-    this.getX2 = function () {
-        return this.x2;
-    };
-    this.getY2 = function () {
-        return this.y2;
-    };
-    this.getDirection = function () {
-        return this.direction;
-    };
-    this.setDirection = function (ir) {
-        this.direction = ir;
-    };
     this.getLevel = function () {
         return this.level;
     };
@@ -376,25 +341,16 @@ function Mob (kx, ky, l) {
     };
 }
 
+Mob.prototype = GameObject.prototype;
+Mob.prototype = new GameObject();
+Mob.prototype.constructor = Mob;
+
 function Bullet (x, y, kx, ky, direction) {
-    this.kx = kx;
-    this.ky = ky;
-    this.x = x + corrected_bullet;
-    this.y = y + corrected_bullet;
-    this.x2 = this.x + bullet_size;
-    this.y2 = this.y + bullet_size;
-    this.ox = this.x + tile_size / 2;
-    this.oy = this.y + tile_size / 2;
+    GameObject.call(this, kx, ky, x+corrected_bullet, y+corrected_bullet);
+
     this.direction = direction;
 
-    this.resize = function (new_size) {
-        this.x = this.x / tile_size * new_size;
-        this.y = this.y / tile_size * new_size;
-        this.x2 = this.x + new_size;
-        this.y2 = this.y + new_size;
-    };
-
-    this.move = function () {
+    this.force_move = function () {
         this.x = this.x + directions[this.direction][0] * bullet_velocity;
         this.y = this.y + directions[this.direction][1] * bullet_velocity;
         this.x2 = this.x + bullet_size;
@@ -404,45 +360,15 @@ function Bullet (x, y, kx, ky, direction) {
         this.kx = Math.floor (this.x / tile_size);
         this.ky = Math.floor (this.y / tile_size);
     };
-    this.isInside = function (px, py) {
-        return this.x <= px && px <= this.x2 && this.y <= py && py <= this.y2;
-    };
-
-    this.getKx = function () {
-        return this.kx;
-    };
-    this.getKy = function () {
-        return this.ky;
-    };
-    this.getOx = function () {
-        return this.ox;
-    };
-    this.getOy = function () {
-        return this.oy;
-    };
-    this.getX = function () {
-        return this.x;
-    };
-    this.getY = function () {
-        return this.y;
-    };
-    this.getX2 = function () {
-        return this.x2;
-    };
-    this.getY2 = function () {
-        return this.y2;
-    };
-    this.getDirection = function () {
-        return this.direction;
-    };
-    this.setDirection = function (ir) {
-        this.direction = ir;
-    };
 
     this.draw = function (mx, my) {
         ctx.drawImage (bulletImages[direction], this.x - mx, this.y - my, bullet_size, bullet_size);
     };
 }
+
+Bullet.prototype = GameObject.prototype;
+Bullet.prototype = new GameObject();
+Bullet.prototype.constructor = Bullet;
 
 function Trouble (name, duration, use, undo_use) {
     this.name = name;
@@ -471,8 +397,8 @@ function newGame () {
     bullet_velocity = base_size / 2;
     mob_velocity = base_size / 4;
 
-    corigate_x = view_width / 2 - tile_size / 2;
-    corigate_y = view_height / 2 - tile_size / 2;
+    corrected_x = view_width / 2 - tile_size / 2;
+    corrected_y = view_height / 2 - tile_size / 2;
 
     tiles_pos_x = [];
     for (let i = 0; i < map_width; i++) {
@@ -726,7 +652,7 @@ function tryToMoveBullet (b) {
         return false;
     }
     if (map.empty (new_coords[0], new_coords[1])) {
-        b.move ();
+        b.force_move ();
         return true;
     }
     return false;
@@ -782,7 +708,7 @@ function shot (p) {
 
 
 function refresh () {
-    c.width = c.width;//Old hack not sure if neccessary
+    c.width = c.width;//Old hack not sure if necessary
 }
 
 function init () {
@@ -922,8 +848,8 @@ function runGame () {
     if (view_width !== window.innerWidth - view_frame || view_height !== window.innerHeight - view_frame) {
         view_width = c.width = window.innerWidth - 20;
         view_height = c.height = window.innerHeight - 20;
-        corigate_x = view_width / 2 - tile_size / 2;
-        corigate_y = view_height / 2 - tile_size / 2;
+        corrected_x = view_width / 2 - tile_size / 2;
+        corrected_y = view_height / 2 - tile_size / 2;
     }
 
     if (timer % tick === 0) {
@@ -1026,8 +952,8 @@ function runGame () {
 }
 
 function drawMainGame () {
-    let mx = player.getX () - corigate_x;
-    let my = player.getY () - corigate_y;
+    let mx = player.getX () - corrected_x;
+    let my = player.getY () - corrected_y;
     map.draw (mx, my, tile_size);
     player.draw (mx, my);
 
