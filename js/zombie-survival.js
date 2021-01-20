@@ -444,11 +444,11 @@ function Bullet (x, y, kx, ky, direction) {
     };
 }
 
-function Trouble (name, duration, use, unuse) {
+function Trouble (name, duration, use, undo_use) {
     this.name = name;
     this.duration = duration;
     this.use = use;
-    this.unuse = unuse;
+    this.undo_use = undo_use;
 }
 
 function newGame () {
@@ -678,7 +678,7 @@ function tryToMobMove (mob) {
         if (mob.getLevel () === 2) {
             if (stink_matrix[mob.getKx ()][mob.getKy ()] !== undefined) {
                 mob.setDirection (mob_level2 (mob.getKx (), mob.getKy ()));
-                if (Math.random () <= 0.2) {//#TODO TÁVOLSÁGARÁNYOSAN FELEJTSEN SZAGOT
+                if (Math.random () <= 0.2) {//#TODO Lose smell according to distance from player
                     mob.setDirection (mob_level1 (mob.getKx (), mob.getKy (), mob.getDirection ()));
                     mob.setLevel (1);
                 }
@@ -934,7 +934,7 @@ function runGame () {
             if (current_trouble.duration > 0) {
                 current_trouble.duration--;
             } else { // if(current_trouble.duration === 0)
-                current_trouble.unuse ();
+                current_trouble.undo_use ();
                 current_trouble = -1;
             }
         }
@@ -944,7 +944,7 @@ function runGame () {
         add_trouble (new Trouble (trouble_def[next_trouble].name,
             trouble_def[next_trouble].duration,
             trouble_def[next_trouble].use,
-            trouble_def[next_trouble].unuse));
+            trouble_def[next_trouble].undo_use));
 
         next_trouble = Math.floor (Math.random () * trouble_def.length);
     }
@@ -1012,7 +1012,7 @@ function runGame () {
         }
 
         if (current_trouble !== -1) {
-            current_trouble.unuse ();
+            current_trouble.undo_use ();
         }
 
         newGame ();
