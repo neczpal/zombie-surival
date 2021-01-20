@@ -139,6 +139,12 @@ const zombieBotImages = [zombieBotImage1, zombieBotImage2, zombieBotImage3];
 
 const zombieImages = [zombieTopImages, zombieRightImages, zombieBotImages, zombieLeftImages];
 
+function extend (child, parent) {
+    child.prototype = parent.prototype;
+    child.prototype = new parent ();
+    child.prototype.constructor = child;
+}
+
 //Used for the stinks method
 function Point (x, y) {
     this.x = x;
@@ -319,10 +325,7 @@ function Player (kx, ky) {
         ctx.drawImage (zombieImages[this.direction][this.walking ? anim_index : 1], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
-
-Player.prototype = GameObject.prototype;
-Player.prototype = new GameObject ();
-Player.prototype.constructor = Player;
+extend(Player, GameObject);
 
 function Mob (kx, ky, lev) {
     GameObject.call (this, kx, ky, kx * tile_size, ky * tile_size);
@@ -340,10 +343,7 @@ function Mob (kx, ky, lev) {
         ctx.drawImage (zombieImages[this.direction][anim_index], this.x - mx, this.y - my, tile_size, tile_size);
     };
 }
-
-Mob.prototype = GameObject.prototype;
-Mob.prototype = new GameObject ();
-Mob.prototype.constructor = Mob;
+extend(Mob, GameObject);
 
 function Bullet (x, y, kx, ky, direction) {
     GameObject.call (this, kx, ky, x + corrected_bullet, y + corrected_bullet);
@@ -365,10 +365,7 @@ function Bullet (x, y, kx, ky, direction) {
         ctx.drawImage (bulletImages[direction], this.x - mx, this.y - my, bullet_size, bullet_size);
     };
 }
-
-Bullet.prototype = GameObject.prototype;
-Bullet.prototype = new GameObject ();
-Bullet.prototype.constructor = Bullet;
+extend(Bullet, GameObject);
 
 function Trouble (name, duration, use, undo_use) {
     this.name = name;
