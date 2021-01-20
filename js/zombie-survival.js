@@ -934,7 +934,6 @@ function drawMainGame () {
     let mx = player.getX () - corrected_x;
     let my = player.getY () - corrected_y;
     map.draw (mx, my, tile_size);
-    player.draw (mx, my);
 
 
     for (let i = 0; i < mobs.length; i++) {
@@ -944,6 +943,7 @@ function drawMainGame () {
     for (let i = 0; i < bullets.length; i++) {
         bullets[i].draw (mx, my);
     }
+    player.draw (mx, my);
 }
 
 function drawGame () {
