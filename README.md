@@ -10,7 +10,9 @@ to find path to get to you.
     <img src="https://github.com/neczpal/zombie-survival/raw/master/res/screenshot.png" width="600" />
 </p>
 
-## Play 
+### Play it [here](https://neczpal.github.io/zombie-survival/)
+
+## Instructions 
 
 ### Objective
   Don't collide with enemies and shot
@@ -22,7 +24,7 @@ to find path to get to you.
   * Shot: Space or X
 
 ### Points:
-  * 10 / second + 50 / destroyed units
+  * 10 / second + 50 / destroyed zombie
 
 ### Incidents:
 Name            | Effect
@@ -35,8 +37,6 @@ Stinky          | Enemies can smell you from twice as far away
 Reverse control | Input controls are swapped
 Blackout        | The display sometimes blackout
      
-### Try it [here](https://neczpal.github.io/zombie-survival/)
-
 ## License
 
 All Rights Reserved.
