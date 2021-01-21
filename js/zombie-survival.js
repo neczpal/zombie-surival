@@ -74,6 +74,7 @@ let tiles_pos_x; // i*tile_size
 let tiles_pos_y; // j*tile_size
 
 let corrected_bullet;// tile_size/2 - bullet_size/2
+let corrected_x, corrected_y;
 
 let view_frame = 10;
 let view_width, view_height;
