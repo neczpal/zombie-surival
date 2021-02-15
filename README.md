@@ -1,4 +1,3 @@
-
 # Zombie Survival
 
 A 2d tile based survival game with random incidents
@@ -33,13 +32,13 @@ Explosion       | Destroy walls around the player
 Broken leg      | Halves player speed
 Frenzy          | Doubles enemy speed
 Unarmed         | Player can't shot
-Stinky          | Enemies can smell you from twice as far away
+Stinky          | Enemies can smell you from twice as far
 Reverse control | Input controls are swapped
 Blackout        | The display sometimes blackout
      
 ## License
 
-All Rights Reserved.
+MIT
 
 Copyright (c) 2021 Neczpál Ábel.
 
@@ -52,4 +51,4 @@ however, please contact me before doing so.
 
 Neczpál Ábel - [neczpal@gmail.com](mailto:neczpal@gmail.com)
 
-Project Link: [https://github.com/neczpal/zombie-survival](https://github.com/neczpal/zombie-survival)
+Project Link - [https://github.com/neczpal/zombie-survival](https://github.com/neczpal/zombie-survival)
