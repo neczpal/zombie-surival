@@ -116,7 +116,7 @@ function loadCharacterImages (resourceName, frames, width, height) {
 const crateImage = loadImage ("crate", 256, 256);
 const floorImage = loadImage ("floor", 345, 345);
 const bulletImages = load4DirectionalImage ("bullet", 128, 128);
-const weaponImage = load4DirectionalImage("weapon", 74, 74);
+const weaponImage = load4DirectionalImage ("weapon", 74, 74);
 const zombieImages = loadCharacterImages ("zombie", 3, 74, 74);
 const heroImages = loadCharacterImages ("hero", 3, 74, 74);
 
@@ -961,8 +961,20 @@ function drawGame () {
         if (blackout_is_light) {
             drawMainGame ();
         } else {
-            ctx.fillStyle = "#000000";
-            ctx.fillRect (0, 0, view_width, view_height);
+            drawMainGame ();
+
+            let maskCanvas = document.createElement ('canvas');
+            maskCanvas.width = c.width;
+            maskCanvas.height = c.height;
+            let maskCtx = maskCanvas.getContext ('2d');
+
+            maskCtx.fillStyle = "black";
+            maskCtx.fillRect (0, 0, maskCanvas.width, maskCanvas.height);
+            maskCtx.globalCompositeOperation = 'xor';
+            maskCtx.arc (view_width/2, view_height/2, base_size, 0, 2 * Math.PI);
+            maskCtx.fill ();
+
+            ctx.drawImage (maskCanvas, 0, 0);
         }
 
     } else {
