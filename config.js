@@ -1,4 +1,5 @@
 const base_size = 80;
+const tile_size = base_size;//tile_size made constant
 const base_spawn_rate = 500;
 const base_stink_dist = 12;
 
