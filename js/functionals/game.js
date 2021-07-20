@@ -5,7 +5,7 @@ let anim_index = 0;
 let lose = false;
 
 let spawn_rate;
-let mob_skill;//#TODO
+let mob_skill;//#TODO Make mobs level up faster as time goes on?
 
 let map;//Map
 let player;//Player p;

@@ -2,6 +2,7 @@ let trouble_def = [];
 
 let current_trouble;
 let next_trouble;
+//#TODO Create animation for troubles
 
 trouble_def[0] = new Trouble ("Explosion", -1, function () {
     let from_x = Math.max (player.getFx () - explosion_size, 0);

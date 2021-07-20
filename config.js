@@ -26,3 +26,5 @@ const map_height = 50;
 const tick = 10;
 
 const animation_rate = 2;
+//#TODO Create a config menu where user can set these values - also randomize them
+//#TODO Also switch troubles on or off - and choose which one will be part of the game

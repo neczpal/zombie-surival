@@ -5,3 +5,4 @@ function init () {
 
     newGame ();
 }
+//#TODO making project into TypeScript and npm

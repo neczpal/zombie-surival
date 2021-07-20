@@ -1,5 +1,5 @@
 let pressedKey = []; //HashSet
-
+//#TODO shooting feels bad
 function registerEventListeners () {
     window.addEventListener ("keydown", doKeyDown, false);
     window.addEventListener ("keyup", doKeyUp, false);
