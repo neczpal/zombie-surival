@@ -1,58 +1,32 @@
 let c, ctx;
 
-let base_size = 80;
-let base_spawn_rate = 500;
-let base_stink_dist = 12;
-
-let trouble_rate = 250;
-let explosion_size = 2;
-let slow_scale = 8;
-let slow_duration = 7;
-let fast_active = false;
-let fast_scale = 2;
-let fast_duration = 4;
-let unarmed_active = false;
-let unarmed_duration = 5;
-let stinky_scale = 2;
-let stinky_duration = 10;
-let reverse_active = false;
-let reverse_duration = 5;
-let blackout_active = false;
-let blackout_duration = 8;
-let blackout_night = 35;
-let blackout_is_light = false;
-
-let wall_rate = 35;
-let wall_min = 3;
-let wall_max = 5;
-
-let map_width = 50;
-let map_height = 50;
-
-let tick = 10;
 let timer;
 
 let anim_index = 0;
-let animation_rate = 2;
-
-let directions = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
 let bullet_size;
-let tile_size;
 
+let tile_size;
 let bullet_velocity;
+
 let player_velocity;
 let player_velocity_x;
 let player_velocity_y;
 let mob_velocity;
 let spawn_rate;
-
 let mob_skill;//#TODO
+
 let stink_matrix;
 let stink_dist;
 
 let current_trouble;
 let next_trouble;
+
+let fast_active = false;
+let unarmed_active = false;
+let reverse_active = false;
+let blackout_active = false;
+let blackout_is_light = false;
 
 
 let score;
@@ -76,12 +50,14 @@ let tiles_pos_y; // j*tile_size
 let corrected_bullet;// tile_size/2 - bullet_size/2
 let corrected_x, corrected_y;
 
-let view_frame = 10;
+const view_frame = 10;
 let view_width, view_height;
 
 let info_score;
 let info_trouble;
 let info_high_score;
+
+const directions = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
 //Images
 
