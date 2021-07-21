@@ -6,6 +6,10 @@ function drawMainGame () {
     let my = player.getY () - corrected_y;
     map.draw (mx, my, tile_size);
 
+    if (show_stink_matrix) {
+        drawStinkMatrix (mx, my, tile_size);
+    }
+
 
     for (let i = 0; i < mobs.length; i++) {
         mobs[i].draw (mx, my);
@@ -60,4 +64,18 @@ function drawGame () {
         ctx.fillText (currentTroubleDef.name + ": " + troubleLeftDuration, view_width / 2 - currentTroubleDef.name.length * 5, view_height / 2 + base_size);
     }
 
+}
+
+function drawStinkMatrix (x, y, tile_size) {
+    for (let i = 0; i < map_width; i++) {
+        for (let j = 0; j < map_height; j++) {
+            ctx.fillStyle = "#f0ece3";
+            ctx.font = "16px Georgia";
+            // ctx.drawImage (zombieImages, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
+            if (stink_matrix[i][j])
+                ctx.fillText (stink_matrix[i][j], tiles_pos_x[i] - x + tile_size / 2, tiles_pos_y[j] - y + tile_size / 2 + 8, tile_size);
+            // ctx.fillText(stink_matrix[i][j], tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size);
+            // ctx.drawImage (floorImage, tiles_pos_x[i] - x, tiles_pos_y[j] - y, tile_size, tile_size);
+        }
+    }
 }

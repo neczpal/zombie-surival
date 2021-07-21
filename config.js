@@ -21,7 +21,6 @@ const wall_rate = 35;
 
 const wall_min = 3;
 const wall_max = 5;
-const map_width = 50;
 
 const map_height = 50;
 const tick = 10;
@@ -40,4 +39,9 @@ const blackout_enabled = true;
 
 
 const shooting_speed = 5;
+
+//DEV
+
+const show_stink_matrix = true;
+
 //#TODO Create a config menu where user can set these values - also randomize them
