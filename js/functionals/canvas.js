@@ -10,4 +10,3 @@ function initCanvas () {
 
     ctx = c.getContext ("2d");
 }
-//#TODO canvas size change buggy
