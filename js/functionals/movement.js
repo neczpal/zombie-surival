@@ -66,3 +66,42 @@ function shot (p) {
         bullets.push (new Bullet (p.getX (), p.getY (), p.getFx (), p.getFy (), p.getDirection ()));
     }
 }
+
+//Game tick functions
+
+function tickPlayerMoving () {
+    let move = false;
+    if (reverse_active) {
+        for (let i = 0; i < 4; i++) {
+            if (pressedKey[i]) {
+                tryToMovePlayer (player, turn (i));
+                move = true;
+            }
+        }
+    } else {
+        for (let i = 0; i < 4; i++) {
+            if (pressedKey[i]) {
+                tryToMovePlayer (player, i);
+                move = true;
+            }
+        }
+    }
+    if (!move) {
+        player.stop ();
+    }
+}
+
+function tickPlayerShooting () {
+    //#TODO Shooting speed and/or mb more weapons
+    if (pressedKey[KEY_SHOOT]) {
+        shot (player);
+    }
+}
+
+function tickBulletsMoving () {
+    for (let i = 0; i < bullets.length; i++) {
+        if (!tryToMoveBullet (bullets[i])) {
+            bullets_trash.push (i);
+        }
+    }
+}

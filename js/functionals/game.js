@@ -70,16 +70,7 @@ function newGame () {
     nextTroubleIndex = Math.floor (Math.random () * troubleDefs.length);
 }
 
-//#Untangle runGame function
 function runGame () {
-    // Resize only used on desktop probably
-    if (view_width !== window.innerWidth - view_frame || view_height !== window.innerHeight - view_frame) {
-        view_width = c.width = window.innerWidth - view_frame;
-        view_height = c.height = window.innerHeight - view_frame;
-        corrected_x = view_width / 2 - tile_size / 2;
-        corrected_y = view_height / 2 - tile_size / 2;
-    }
-
     // Tick update
     if (timer % tick === 0) {
         score += 5;
@@ -98,69 +89,22 @@ function runGame () {
     }
 
     // Player Moving
-    let move = false;
-    if (reverse_active) {
-        for (let i = 0; i < 4; i++) {
-            if (pressedKey[i]) {
-                tryToMovePlayer (player, turn (i));
-                move = true;
-            }
-        }
-    } else {
-        for (let i = 0; i < 4; i++) {
-            if (pressedKey[i]) {
-                tryToMovePlayer (player, i);
-                move = true;
-            }
-        }
-    }
-    if (!move) {
-        player.stop ();
-    }
+    tickPlayerMoving ();
 
     //Shooting
-    //#TODO Shooting speed and/or mb more weapons
-    if (pressedKey[KEY_SHOOT]) {
-        shot (player);
-    }
+    tickPlayerShooting ();
 
     //Bullet moving
-    for (let i = 0; i < bullets.length; i++) {
-        if (!tryToMoveBullet (bullets[i])) {
-            bullets_trash.push (i);
-        }
-    }
+    tickBulletsMoving ();
 
     //Mob moving
-    for (let i = 0; i < mobs.length; i++) {
-        tryToMobMove (mobs[i]);
-    }
+    tickMobsMoving ();
 
     //Deletes
-    while (bullets_trash.length) {
-        bullets.splice (bullets_trash.pop (), 1);
-    }
-    while (mobs_trash.length) {
-        mobs.splice (mobs_trash.pop (), 1);
-    }
+    deleteDeadGameObjects ();
 
     //Spawning
-    if (Math.floor (Math.random () * 10000) < spawn_rate) {
-        switch (Math.floor (Math.random () * 4)) {
-            case 0:
-                mobs.push (new Mob (0, Math.floor (Math.random () * map.getHeight ()), 0));
-                break;
-            case 1:
-                mobs.push (new Mob (map.getWidth () - 1, Math.floor (Math.random () * map.getHeight ()), 0));
-                break;
-            case 2:
-                mobs.push (new Mob (Math.floor (Math.random () * map.getWidth ()), 0, 0));
-                break;
-            case 3:
-                mobs.push (new Mob (Math.floor (Math.random () * map.getWidth ()), map.getHeight () - 1, 0));
-                break;
-        }
-    }
+    tickMobsSpawn ();
 
     //Losing
     if (lose) {
@@ -169,7 +113,7 @@ function runGame () {
             high_score = score;
         }
 
-        if (currentTroubleDef !== -1) {
+        if (troubleLeftDuration !== -1) {
             currentTroubleDef.undo_use ();
         }
 
@@ -177,13 +121,17 @@ function runGame () {
     }
 
     //Scoreboard
-    info_high_score = "High score: " + ((high_score === -1) ? "-" : high_score);
-    if (troubles_enabled) {
-        let left_time = (trouble_rate - timer % trouble_rate) / 10;
-        info_trouble = troubleDefs[nextTroubleIndex].name + ": " + left_time;
-    } else {
-        info_trouble = ''
-    }
-    info_score = "Score: " + score;
+    updateScoreboard ();
+
     timer++;
+}
+
+
+function deleteDeadGameObjects () {
+    while (bullets_trash.length) {
+        bullets.splice (bullets_trash.pop (), 1);
+    }
+    while (mobs_trash.length) {
+        mobs.splice (mobs_trash.pop (), 1);
+    }
 }

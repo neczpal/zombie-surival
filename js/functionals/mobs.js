@@ -147,3 +147,28 @@ function tryToMobMove (mob) {
     mob.move (vx * mob.v, vy * mob.v);
     return true;
 }
+
+function tickMobsMoving () {
+    for (let i = 0; i < mobs.length; i++) {
+        tryToMobMove (mobs[i]);
+    }
+}
+
+function tickMobsSpawn () {
+    if (Math.floor (Math.random () * 10000) < spawn_rate) {
+        switch (Math.floor (Math.random () * 4)) {
+            case 0:
+                mobs.push (new Mob (0, Math.floor (Math.random () * map.getHeight ()), 0));
+                break;
+            case 1:
+                mobs.push (new Mob (map.getWidth () - 1, Math.floor (Math.random () * map.getHeight ()), 0));
+                break;
+            case 2:
+                mobs.push (new Mob (Math.floor (Math.random () * map.getWidth ()), 0, 0));
+                break;
+            case 3:
+                mobs.push (new Mob (Math.floor (Math.random () * map.getWidth ()), map.getHeight () - 1, 0));
+                break;
+        }
+    }
+}

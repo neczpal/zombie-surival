@@ -18,6 +18,8 @@ function drawMainGame () {
 }
 
 function drawGame () {
+    // Resize only used on desktop probably
+    refreshCanvasDimensions ();
 
     if (blackout_active) {
         if (timer % blackout_night === 0) {
