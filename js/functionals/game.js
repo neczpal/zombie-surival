@@ -57,6 +57,9 @@ function newGame () {
     }
     corrected_bullet = tile_size / 2 - bullet_size / 2;
 
+    if (troubles_enabled) {
+        enableTroubles ();
+    }
 
     map = new Map (map_width, map_height);
     map.set (map_width / 2, map_height / 2, 0);
@@ -89,8 +92,8 @@ function runGame () {
             }
         }
     }
-    //Incidents
-    if (timer % trouble_rate === 0) {
+    // Troubles
+    if (troubles_enabled && timer % trouble_rate === 0) {
         add_trouble (new Trouble (trouble_def[next_trouble].name,
             trouble_def[next_trouble].duration,
             trouble_def[next_trouble].use,
@@ -98,6 +101,7 @@ function runGame () {
 
         next_trouble = Math.floor (Math.random () * trouble_def.length);
     }
+
     if (timer % animation_rate === 0) {
         anim_index = (anim_index + 1) % 3
     }
@@ -183,8 +187,12 @@ function runGame () {
 
     //Scoreboard
     info_high_score = "High score: " + ((high_score === -1) ? "-" : high_score);
-    let left_time = (trouble_rate - timer % trouble_rate) / 10;
-    info_trouble = trouble_def[next_trouble].name + ": " + left_time;
+    if (troubles_enabled) {
+        let left_time = (trouble_rate - timer % trouble_rate) / 10;
+        info_trouble = trouble_def[next_trouble].name + ": " + left_time;
+    } else {
+        info_trouble = ''
+    }
     info_score = "Score: " + score;
     timer++;
 }

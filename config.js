@@ -26,5 +26,17 @@ const map_height = 50;
 const tick = 10;
 
 const animation_rate = 2;
+
+const troubles_enabled = true;
+
+const explosion_enabled = true;
+const broken_leg_enabled = true;
+const frenzy_enabled = true;
+const unarmed_enabled = true;
+const stinky_enabled = true;
+const reverse_control_enabled = true;
+const blackout_enabled = true;
+
+
+const shooting_speed = 5;
 //#TODO Create a config menu where user can set these values - also randomize them
-//#TODO Also switch troubles on or off - and choose which one will be part of the game
