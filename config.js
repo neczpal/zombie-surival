@@ -22,6 +22,7 @@ const wall_rate = 35;
 const wall_min = 3;
 const wall_max = 5;
 
+const map_width = 50;
 const map_height = 50;
 const tick = 10;
 

@@ -53,9 +53,9 @@ function drawGame () {
 
     ctx.fillStyle = "#f0ece3";
     ctx.font = "34px Georgia";
-    ctx.fillText (info_score, 50, 50);
-    ctx.fillText (info_trouble, 400, 50);
-    ctx.fillText (info_high_score, 800, 50);
+    ctx.fillText (info_score, 25, 50);
+    ctx.fillText (info_trouble, view_width / 3, 50);
+    ctx.fillText (info_high_score, view_width / 1.5, 50);
 
     if (troubleLeftDuration > 0) {
         ctx.font = "17px Georgia";
