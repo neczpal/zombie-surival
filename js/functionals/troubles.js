@@ -1,7 +1,10 @@
-let trouble_def = [];
+let troubleDefs = [];
+let currentTroubleDef;
 
-let current_trouble;
-let next_trouble;
+let nextTroubleIndex;
+
+let troubleLeftDuration;
+
 //#TODO Create animation for troubles
 
 const explosion_trouble = new Trouble ("Explosion", -1, function () {
@@ -62,33 +65,50 @@ const blackout_trouble = new Trouble ("Blackout", blackout_duration, function ()
 
 function enableTroubles () {
     if (explosion_enabled) {
-        trouble_def.push (explosion_trouble);
+        troubleDefs.push (explosion_trouble);
     }
     if (broken_leg_enabled) {
-        trouble_def.push (broken_leg_trouble);
+        troubleDefs.push (broken_leg_trouble);
     }
     if (frenzy_enabled) {
-        trouble_def.push (frenzy_trouble);
+        troubleDefs.push (frenzy_trouble);
     }
     if (unarmed_enabled) {
-        trouble_def.push (unarmed_trouble);
+        troubleDefs.push (unarmed_trouble);
     }
     if (stinky_enabled) {
-        trouble_def.push (stinky_trouble);
+        troubleDefs.push (stinky_trouble);
     }
     if (reverse_control_enabled) {
-        trouble_def.push (reverse_control_trouble);
+        troubleDefs.push (reverse_control_trouble);
     }
     if (blackout_enabled) {
-        trouble_def.push (blackout_trouble);
+        troubleDefs.push (blackout_trouble);
     }
 }
 
-function add_trouble (trouble) {
+function activateNextTrouble () {
+    let trouble = troubleDefs[nextTroubleIndex];
+
     trouble.use ();
     if (trouble.duration > 0) {
-        current_trouble = trouble;
+        currentTroubleDef = trouble;
+        troubleLeftDuration = trouble.duration;
     } else {
-        current_trouble = -1;
+        troubleLeftDuration = -1;
+    }
+
+    nextTroubleIndex = Math.floor (Math.random () * troubleDefs.length);
+}
+
+function troubleTick () {
+    if (troubleLeftDuration !== -1) {
+        if (troubleLeftDuration > 0) {
+            troubleLeftDuration--;
+        } else { // if (current_trouble.duration === 0)
+            //Use undo function then set to deactivated state
+            currentTroubleDef.undo_use ();
+            troubleLeftDuration = -1;
+        }
     }
 }

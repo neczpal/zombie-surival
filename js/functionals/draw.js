@@ -53,9 +53,9 @@ function drawGame () {
     ctx.fillText (info_high_score, 800, 50);
 
 
-    if (current_trouble.duration > 0) {
+    if (troubleLeftDuration > 0) {
         ctx.font = "17px Georgia";
-        ctx.fillText (current_trouble.name + ": " + current_trouble.duration, view_width / 2 - current_trouble.name.length * 5, view_height / 2 + base_size);
+        ctx.fillText (currentTroubleDef.name + ": " + troubleLeftDuration, view_width / 2 - currentTroubleDef.name.length * 5, view_height / 2 + base_size);
     }
 
 }

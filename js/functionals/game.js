@@ -29,7 +29,8 @@ function newGame () {
 
     mobs = [];
     bullets = [];
-    current_trouble = -1;
+    currentTroubleDef = {};
+    troubleLeftDuration = -1;
 
     mob_skill = 150;
     spawn_rate = base_spawn_rate;
@@ -66,9 +67,10 @@ function newGame () {
     player = new Player (map_width / 2, map_height / 2);
 
     stinks (new Point (player.getFx (), player.getFy ()));
-    next_trouble = Math.floor (Math.random () * trouble_def.length);
+    nextTroubleIndex = Math.floor (Math.random () * troubleDefs.length);
 }
 
+//#Untangle runGame function
 function runGame () {
     // Resize only used on desktop probably
     if (view_width !== window.innerWidth - view_frame || view_height !== window.innerHeight - view_frame) {
@@ -83,23 +85,12 @@ function runGame () {
         score += 5;
         mob_skill++;
         spawn_rate += 10;
-        if (current_trouble !== -1) {
-            if (current_trouble.duration > 0) {
-                current_trouble.duration--;
-            } else { // if(current_trouble.duration === 0)
-                current_trouble.undo_use ();
-                current_trouble = -1;
-            }
-        }
+
+        troubleTick ();
     }
     // Troubles
     if (troubles_enabled && timer % trouble_rate === 0) {
-        add_trouble (new Trouble (trouble_def[next_trouble].name,
-            trouble_def[next_trouble].duration,
-            trouble_def[next_trouble].use,
-            trouble_def[next_trouble].undo_use));
-
-        next_trouble = Math.floor (Math.random () * trouble_def.length);
+        activateNextTrouble ();
     }
 
     if (timer % animation_rate === 0) {
@@ -178,8 +169,8 @@ function runGame () {
             high_score = score;
         }
 
-        if (current_trouble !== -1) {
-            current_trouble.undo_use ();
+        if (currentTroubleDef !== -1) {
+            currentTroubleDef.undo_use ();
         }
 
         newGame ();
@@ -189,7 +180,7 @@ function runGame () {
     info_high_score = "High score: " + ((high_score === -1) ? "-" : high_score);
     if (troubles_enabled) {
         let left_time = (trouble_rate - timer % trouble_rate) / 10;
-        info_trouble = trouble_def[next_trouble].name + ": " + left_time;
+        info_trouble = troubleDefs[nextTroubleIndex].name + ": " + left_time;
     } else {
         info_trouble = ''
     }

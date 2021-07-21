@@ -3,6 +3,7 @@ const tile_size = base_size;//tile_size made constant
 const base_spawn_rate = 500;
 const base_stink_dist = 12;
 
+//#TODO More simultaneous trouble makes game buggy
 const trouble_rate = 250;
 const explosion_size = 2;
 const slow_scale = 8;
