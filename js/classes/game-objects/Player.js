@@ -27,7 +27,7 @@ function Player (kx, ky) {
     this.draw = function (mx, my) {
         ctx.drawImage (heroImages[this.walking ? anim_index : 1][this.direction], this.x - mx, this.y - my, tile_size, tile_size);
 
-        if (pressedKey[4] && this.direction !== 0) {
+        if (pressedKey[KEY_SHOOT] && this.direction !== 0) {
             ctx.drawImage (weaponImage[this.direction], this.x - mx, this.y - my, tile_size, tile_size);
         }
     };

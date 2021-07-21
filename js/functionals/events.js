@@ -1,5 +1,13 @@
 let pressedKey = []; //HashSet
-//#TODO shooting feels bad
+
+const KEY_UP = 0;
+const KEY_RIGHT = 1;
+const KEY_DOWN = 2;
+const KEY_LEFT = 3;
+const KEY_SHOOT = 4;
+
+const KEY_DIRECTION_KEYS = [KEY_UP, KEY_RIGHT, KEY_DOWN, KEY_LEFT];
+
 function registerEventListeners () {
     window.addEventListener ("keydown", doKeyDown, false);
     window.addEventListener ("keyup", doKeyUp, false);
@@ -22,36 +30,34 @@ function doKeyEvent (event, state) {
         case 'ArrowUp':
         case  87:
         case  38:
-            pressedKey[0] = state;
-            break;
-        case 'a':
-        case 'Left':
-        case 'ArrowLeft':
-        case  65:
-        case  37:
-            pressedKey[3] = state;
-            break;
-        case 's':
-        case 'Down':
-        case 'ArrowDown':
-        case  83:
-        case  40:
-            pressedKey[2] = state;
+            pressedKey[KEY_UP] = state;
             break;
         case 'd':
         case 'Right':
         case 'ArrowRight':
         case  68:
         case  39:
-            pressedKey[1] = state;
+            pressedKey[KEY_RIGHT] = state;
+            break;
+        case 's':
+        case 'Down':
+        case 'ArrowDown':
+        case  83:
+        case  40:
+            pressedKey[KEY_DOWN] = state;
+            break;
+        case 'a':
+        case 'Left':
+        case 'ArrowLeft':
+        case  65:
+        case  37:
+            pressedKey[KEY_LEFT] = state;
             break;
         case ' ':
         case 'x':
         case  32:
         case  88:
-            pressedKey[4] = state;
-            if (state)
-                shot (player);
+            pressedKey[KEY_SHOOT] = state;
             break;
     }
 }

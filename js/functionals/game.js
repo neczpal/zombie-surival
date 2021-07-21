@@ -67,7 +67,7 @@ function newGame () {
 }
 
 function runGame () {
-    //Resize only used on desktop probably
+    // Resize only used on desktop probably
     if (view_width !== window.innerWidth - view_frame || view_height !== window.innerHeight - view_frame) {
         view_width = c.width = window.innerWidth - 20;
         view_height = c.height = window.innerHeight - 20;
@@ -75,6 +75,7 @@ function runGame () {
         corrected_y = view_height / 2 - tile_size / 2;
     }
 
+    // Tick update
     if (timer % tick === 0) {
         score += 5;
         mob_skill++;
@@ -88,7 +89,7 @@ function runGame () {
             }
         }
     }
-    //Incident
+    //Incidents
     if (timer % trouble_rate === 0) {
         add_trouble (new Trouble (trouble_def[next_trouble].name,
             trouble_def[next_trouble].duration,
@@ -101,6 +102,7 @@ function runGame () {
         anim_index = (anim_index + 1) % 3
     }
 
+    // Player Moving
     let move = false;
     if (reverse_active) {
         for (let i = 0; i < 4; i++) {
@@ -121,15 +123,24 @@ function runGame () {
         player.stop ();
     }
 
+    //Shooting
+    //#TODO Shooting speed and/or mb more weapons
+    if (pressedKey[KEY_SHOOT]) {
+        shot (player);
+    }
+
+    //Bullet moving
     for (let i = 0; i < bullets.length; i++) {
         if (!tryToMoveBullet (bullets[i])) {
             bullets_trash.push (i);
         }
     }
 
+    //Mob moving
     for (let i = 0; i < mobs.length; i++) {
         tryToMobMove (mobs[i]);
     }
+
     //Deletes
     while (bullets_trash.length) {
         bullets.splice (bullets_trash.pop (), 1);
@@ -138,6 +149,7 @@ function runGame () {
         mobs.splice (mobs_trash.pop (), 1);
     }
 
+    //Spawning
     if (Math.floor (Math.random () * 10000) < spawn_rate) {
         switch (Math.floor (Math.random () * 4)) {
             case 0:
@@ -154,6 +166,8 @@ function runGame () {
                 break;
         }
     }
+
+    //Losing
     if (lose) {
         //#TODO LOSE screen
         if (score > high_score) {
@@ -167,6 +181,7 @@ function runGame () {
         newGame ();
     }
 
+    //Scoreboard
     info_high_score = "High score: " + ((high_score === -1) ? "-" : high_score);
     let left_time = (trouble_rate - timer % trouble_rate) / 10;
     info_trouble = trouble_def[next_trouble].name + ": " + left_time;
