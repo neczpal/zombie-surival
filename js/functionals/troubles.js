@@ -1,9 +1,10 @@
 let troubleDefs = [];
-let currentTroubleDef;
+let currentTroubles = [];
+// let currentTroubleDef;
 
 let nextTroubleIndex;
 
-let troubleLeftDuration;
+// let troubleLeftDuration;
 
 //#TODO Create animation for troubles
 
@@ -88,27 +89,46 @@ function enableTroubles () {
 }
 
 function activateNextTrouble () {
-    let trouble = troubleDefs[nextTroubleIndex];
+    let trouble = Object.assign ({}, troubleDefs[nextTroubleIndex]);
 
     trouble.use ();
     if (trouble.duration > 0) {
-        currentTroubleDef = trouble;
-        troubleLeftDuration = trouble.duration;
+        let isIn = false;
+
+        for (let i = 0; i < currentTroubles.length; i++) {
+            if (currentTroubles[i].name === trouble.name) {
+                currentTroubles[i].duration += trouble.duration;
+                isIn = true;
+            }
+        }
+
+        if (!isIn)
+            currentTroubles.push (trouble);
     } else {
-        troubleLeftDuration = -1;
+        // troubleLeftDuration = -1;
     }
 
     nextTroubleIndex = Math.floor (Math.random () * troubleDefs.length);
 }
 
 function troubleTick () {
-    if (troubleLeftDuration !== -1) {
-        if (troubleLeftDuration > 0) {
-            troubleLeftDuration--;
-        } else { // if (current_trouble.duration === 0)
-            //Use undo function then set to deactivated state
-            currentTroubleDef.undo_use ();
-            troubleLeftDuration = -1;
+    if (currentTroubles.length) {
+        let troublesTrash = [];
+
+        for (let i = 0; i < currentTroubles.length; i++) {
+            let trouble = currentTroubles[i];
+            if (trouble.duration > 0) {
+                trouble.duration--;
+            } else { // if (current_trouble.duration === 0)
+                //Use undo function then set to deactivated state
+                trouble.undo_use ();
+                trouble.duration = -1;
+                troublesTrash.push (trouble);
+            }
+        }
+
+        while (troublesTrash.length) {
+            currentTroubles.splice (troublesTrash.pop (), 1);
         }
     }
 }

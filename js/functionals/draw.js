@@ -57,9 +57,21 @@ function drawGame () {
     ctx.fillText (info_trouble, view_width / 3, 50);
     ctx.fillText (info_high_score, view_width / 1.5, 50);
 
-    if (troubleLeftDuration > 0) {
+    if (currentTroubles.length) {
         ctx.font = "17px Georgia";
-        ctx.fillText (currentTroubleDef.name + ": " + troubleLeftDuration, view_width / 2 - currentTroubleDef.name.length * 5, view_height / 2 + base_size);
+
+        let troubleSorted = currentTroubles.sort ((a, b) => {
+            if (a.duration === b.duration) {
+                return a.name - b.name;
+            } else {
+                return a.duration - b.duration;
+            }
+        })
+
+        for (let i = 0; i < troubleSorted.length; i++) {
+            let trouble = troubleSorted[i];
+            ctx.fillText (trouble.name + ": " + trouble.duration, view_width / 2 - trouble.name.length * 5, view_height / 2 + base_size / 2 * (i + 1));
+        }
     }
 }
 

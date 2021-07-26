@@ -29,8 +29,7 @@ function newGame () {
 
     mobs = [];
     bullets = [];
-    currentTroubleDef = {};
-    troubleLeftDuration = -1;
+    currentTroubles = [];
 
     mob_skill = 150;
     spawn_rate = base_spawn_rate;
@@ -113,8 +112,10 @@ function runGame () {
             high_score = score;
         }
 
-        if (troubleLeftDuration !== -1) {
-            currentTroubleDef.undo_use ();
+        if (currentTroubles.length) {
+            for (let i = 0; i < currentTroubles.length; i++) {
+                currentTroubles[i].undo_use ();
+            }
         }
 
         newGame ();
