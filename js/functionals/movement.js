@@ -2,7 +2,7 @@ let player_velocity;
 let player_velocity_x;
 let player_velocity_y;
 let mob_velocity;
-
+//#TODO bullet is buggy
 function tryToMoveBullet (b) {
     let new_coords = getCoordsInDirection (b.getKx (), b.getKy (), b.getX (), b.getY (), b.getDirection ());
 
@@ -19,6 +19,7 @@ function tryToMoveBullet (b) {
     return false;
 }
 
+//#TODO making player always on tile if stops or turns
 function tryToMovePlayer (p, direction) {
     //Setting direction
     p.setDirection (direction);
@@ -68,7 +69,6 @@ function shot (p) {
 }
 
 //Game tick functions
-
 function tickPlayerMoving () {
     let move = false;
     if (reverse_active) {

@@ -7,7 +7,7 @@ let nextTroubleIndex;
 // let troubleLeftDuration;
 
 //#TODO Create animation for troubles
-
+//#TODO add more troubles ideas: slippery | zombies get weapon | fire | bomb | hate
 const explosion_trouble = new Trouble ("Explosion", -1, function () {
     let from_x = Math.max (player.getFx () - explosion_size, 0);
     let from_y = Math.max (player.getFy () - explosion_size, 0);
