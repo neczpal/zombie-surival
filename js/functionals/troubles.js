@@ -1,10 +1,7 @@
 let troubleDefs = [];
-let currentTroubles = [];
-// let currentTroubleDef;
+let activeTroubles = [];
 
 let nextTroubleIndex;
-
-// let troubleLeftDuration;
 
 //#TODO Create animation for troubles
 //#TODO add more troubles ideas: slippery | zombies get weapon | fire | bomb | hate
@@ -95,28 +92,28 @@ function activateNextTrouble () {
     if (trouble.duration > 0) {
         let isIn = false;
 
-        for (let i = 0; i < currentTroubles.length; i++) {
-            if (currentTroubles[i].name === trouble.name) {
-                currentTroubles[i].duration += trouble.duration;
+        // Increase duration if the trouble is already active
+        for (const activeTrouble of activeTroubles) {
+            if (activeTrouble.name === trouble.name) {
+                activeTrouble.duration += trouble.duration;
                 isIn = true;
             }
         }
-
-        if (!isIn)
-            currentTroubles.push (trouble);
-    } else {
-        // troubleLeftDuration = -1;
+        // Only push trouble to active if not already active
+        if (!isIn) {
+            activeTroubles.push (trouble);
+        }
     }
 
     nextTroubleIndex = Math.floor (Math.random () * troubleDefs.length);
 }
 
 function troubleTick () {
-    if (currentTroubles.length) {
+    if (activeTroubles.length) {
         let troublesTrash = [];
 
-        for (let i = 0; i < currentTroubles.length; i++) {
-            let trouble = currentTroubles[i];
+        for (let i = 0; i < activeTroubles.length; i++) {
+            let trouble = activeTroubles[i];
             if (trouble.duration > 0) {
                 trouble.duration--;
             } else { // if (current_trouble.duration === 0)
@@ -128,7 +125,7 @@ function troubleTick () {
         }
 
         while (troublesTrash.length) {
-            currentTroubles.splice (troublesTrash.pop (), 1);
+            activeTroubles.splice (troublesTrash.pop (), 1);
         }
     }
 }

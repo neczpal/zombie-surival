@@ -1,43 +1,29 @@
 let stink_matrix;
 let stink_dist;
 
-function resetStinkMatrix () {
-    stink_matrix = [];
-    for (let i = 0; i < map_width; i++) {
-        stink_matrix[i] = [];
-    }
-}
 
 function stinks (point) {
-    resetStinkMatrix ();
-
+    //Resetting the matrix
+    stink_matrix = createArray (map_width, map_height);
+    //BFS
     let queue = [];
     stink_matrix[point.x][point.y] = 0;
     queue.push (point);
     while (queue.length !== 0) {
-        let c_point = queue.shift ();
-        if (map.empty (c_point.x + 1, c_point.y) && stink_matrix[c_point.x + 1][c_point.y] === undefined) {
-            stink_matrix[c_point.x + 1][c_point.y] = stink_matrix[c_point.x][c_point.y] + 1;
-            if (stink_matrix[c_point.x + 1][c_point.y] < stink_dist) {
-                queue.push (new Point (c_point.x + 1, c_point.y));
-            }
-        }
-        if (map.empty (c_point.x - 1, c_point.y) && stink_matrix[c_point.x - 1][c_point.y] === undefined) {
-            stink_matrix[c_point.x - 1][c_point.y] = stink_matrix[c_point.x][c_point.y] + 1;
-            if (stink_matrix[c_point.x - 1][c_point.y] < stink_dist) {
-                queue.push (new Point (c_point.x - 1, c_point.y));
-            }
-        }
-        if (map.empty (c_point.x, c_point.y + 1) && stink_matrix[c_point.x][c_point.y + 1] === undefined) {
-            stink_matrix[c_point.x][c_point.y + 1] = stink_matrix[c_point.x][c_point.y] + 1;
-            if (stink_matrix[c_point.x][c_point.y + 1] < stink_dist) {
-                queue.push (new Point (c_point.x, c_point.y + 1));
-            }
-        }
-        if (map.empty (c_point.x, c_point.y - 1) && stink_matrix[c_point.x][c_point.y - 1] === undefined) {
-            stink_matrix[c_point.x][c_point.y - 1] = stink_matrix[c_point.x][c_point.y] + 1;
-            if (stink_matrix[c_point.x][c_point.y - 1] < stink_dist) {
-                queue.push (new Point (c_point.x, c_point.y - 1));
+        let currentPoint = queue.shift ();
+        //Check every direction
+        for (const direction of DIRECTION_VALUES) {
+            //If empty and not yet defined
+            if (map.empty (currentPoint.x + direction[0], currentPoint.y + direction[1])
+                && stink_matrix[currentPoint.x + direction[0]][currentPoint.y + direction[1]] === undefined) {
+                //Increase stink number by 1
+                stink_matrix[currentPoint.x + direction[0]][currentPoint.y + direction[1]]
+                    = stink_matrix[currentPoint.x][currentPoint.y] + 1;
+                //If its in the radius stink_dist we push it to the queue
+                if (stink_matrix[currentPoint.x + direction[0]][currentPoint.y + direction[1]] < stink_dist) {
+                    queue.push (new Point (currentPoint.x + direction[0],
+                        currentPoint.y + direction[1]));
+                }
             }
         }
     }

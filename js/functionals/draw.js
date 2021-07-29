@@ -57,10 +57,10 @@ function drawGame () {
     ctx.fillText (info_trouble, view_width / 3, 50);
     ctx.fillText (info_high_score, view_width / 1.5, 50);
 
-    if (currentTroubles.length) {
+    if (activeTroubles.length) {
         ctx.font = "17px Georgia";
 
-        let troubleSorted = currentTroubles.sort ((a, b) => {
+        let troubleSorted = activeTroubles.sort ((a, b) => {
             if (a.duration === b.duration) {
                 return a.name - b.name;
             } else {

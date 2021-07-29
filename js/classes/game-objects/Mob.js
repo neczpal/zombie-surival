@@ -2,6 +2,7 @@ function Mob (kx, ky, lev) {
     GameObject.call (this, kx, ky, kx * tile_size, ky * tile_size);
 
     this.level = lev;
+    this.direction = DOWN;
 
     this.getLevel = function () {
         return this.level;
