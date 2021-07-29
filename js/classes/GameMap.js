@@ -38,16 +38,29 @@ function GameMap (w, h) {
 
                 //Horizontal
                 if (Math.floor (Math.random () * 2) === 0) {
-                    for (let k = 0; k < length && i + k + 1 < this.width && this.tiles[i + k + 1][j] !== 1
-                    && this.tiles[i + k + 1][j + 1] !== 1 && this.tiles[i + k + 1][j - 1] !== 1; k++) {
-                        this.tiles[i + k][j] = 1;
+                    let k = i;
+                    let maxWallXIndex = length + i;
+                    while (k < maxWallXIndex
+                    && k + 1 < this.width
+                    && this.tiles[k + 1][j] !== 1
+                    && this.tiles[k + 1][j + 1] !== 1
+                    && this.tiles[k + 1][j - 1] !== 1) {
+
+                        this.tiles[k][j] = 1;
+                        k++;
                     }
                 }
                 //Vertical
                 else {
-                    for (let k = 0; k < length && j + k + 1 < this.height && this.tiles[i][j + k + 1] !== 1
-                    && this.tiles[i + 1][j + k + 1] !== 1 && this.tiles[i - 1][j + k + 1] !== 1; k++) {
-                        this.tiles[i][j + k] = 1;
+                    let k = j;
+                    let maxWallYIndex = length + j;
+                    while (k < maxWallYIndex
+                    && k + 1 < this.height
+                    && this.tiles[i][k + 1] !== 1
+                    && this.tiles[i + 1][k + 1] !== 1
+                    && this.tiles[i - 1][k + 1] !== 1) {
+                        this.tiles[i][k] = 1;
+                        k++;
                     }
                 }
             }

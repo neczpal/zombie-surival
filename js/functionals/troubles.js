@@ -3,6 +3,12 @@ let activeTroubles = [];
 
 let nextTroubleIndex;
 
+let fast_active = false;
+let unarmed_active = false;
+let reverse_active = false;
+let blackout_active = false;
+let blackout_is_light = false;
+
 //#TODO Create animation for troubles
 //#TODO add more troubles ideas: slippery | zombies get weapon | fire | bomb | hate
 const explosion_trouble = new Trouble ("Explosion", -1, function () {

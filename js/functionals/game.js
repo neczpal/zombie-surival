@@ -15,12 +15,6 @@ let bullets; //List
 let bullets_trash = [];
 let mobs_trash = [];
 
-let fast_active = false;
-let unarmed_active = false;
-let reverse_active = false;
-let blackout_active = false;
-let blackout_is_light = false;
-
 let corrected_bullet;// tile_size/2 - bullet_size/2
 let corrected_x, corrected_y;
 
