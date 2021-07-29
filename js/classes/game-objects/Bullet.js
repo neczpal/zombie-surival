@@ -7,8 +7,8 @@ function Bullet (x, y, kx, ky, direction) {
     this.direction = direction;
 
     this.force_move = function () {
-        this.x = this.x + directions[this.direction][0] * bullet_velocity;
-        this.y = this.y + directions[this.direction][1] * bullet_velocity;
+        this.x = this.x + DIRECTION_VALUES[this.direction][0] * bullet_velocity;
+        this.y = this.y + DIRECTION_VALUES[this.direction][1] * bullet_velocity;
         this.x2 = this.x + bullet_size;
         this.y2 = this.y + bullet_size;
         this.ox = this.x + tile_size / 2;

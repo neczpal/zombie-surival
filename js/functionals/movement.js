@@ -20,12 +20,16 @@ function tryToMoveBullet (b) {
 }
 
 //#TODO making player always on tile if stops or turns
-function tryToMovePlayer (p, direction) {
+function tryToMovePlayer (p) {
+
+}
+
+function tryToMovePlayerInDirection (p, direction) {
     //Setting direction
     p.setDirection (direction);
     let new_coords = getCoordsInDirection (p.getKx (), p.getKy (), p.getX (), p.getY (), direction);
-    let vx = directions[direction][0];
-    let vy = directions[direction][1];
+    let vx = DIRECTION_VALUES[direction][0];
+    let vy = DIRECTION_VALUES[direction][1];
 
     if (p.getX () % tile_size === 0) {
         player_velocity_x = player_velocity;
@@ -71,19 +75,14 @@ function shot (p) {
 //Game tick functions
 function tickPlayerMoving () {
     let move = false;
-    if (reverse_active) {
-        for (let i = 0; i < 4; i++) {
-            if (pressedKey[i]) {
-                tryToMovePlayer (player, turn (i));
-                move = true;
+    for (const key of MOVEMENT_KEYS) {
+        if (pressedKey[key]) {
+            if (reverse_active) {
+                tryToMovePlayerInDirection (player, turn (DIRECTION_INDICES[key]));
+            } else {
+                tryToMovePlayerInDirection (player, DIRECTION_INDICES[key]);
             }
-        }
-    } else {
-        for (let i = 0; i < 4; i++) {
-            if (pressedKey[i]) {
-                tryToMovePlayer (player, i);
-                move = true;
-            }
+            move = true;
         }
     }
     if (!move) {

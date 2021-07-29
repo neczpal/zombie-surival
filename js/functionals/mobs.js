@@ -13,11 +13,11 @@ function turn (direction) {
 function mob_level0 (x, y) {
     let new_x, new_y, opt = [];
 
-    for (let i = 0; i < 4; i++) {
-        new_x = x + directions[i][0];
-        new_y = y + directions[i][1];
+    for (const direction of DIRECTION_INDICES) {
+        new_x = x + DIRECTION_VALUES[direction][0];
+        new_y = y + DIRECTION_VALUES[direction][1];
         if (map.empty (new_x, new_y)) {
-            opt.push (i);
+            opt.push (direction);
         }
     }
 
@@ -28,8 +28,8 @@ function mob_level1 (x, y, direction) {
     let temp = Math.random ();
 
     if (temp <= 0.75) {
-        let new_x = x + directions[direction][0];
-        let new_y = y + directions[direction][1];
+        let new_x = x + DIRECTION_VALUES[direction][0];
+        let new_y = y + DIRECTION_VALUES[direction][1];
 
         if (map.empty (new_x, new_y)) {
             return direction;
@@ -44,8 +44,8 @@ function mob_level1 (x, y, direction) {
         }
     } else if (temp <= 0.85) {
         direction = left (direction);
-        let new_x = x + directions[direction][0];
-        let new_y = y + directions[direction][1];
+        let new_x = x + DIRECTION_VALUES[direction][0];
+        let new_y = y + DIRECTION_VALUES[direction][1];
 
         if (map.empty (new_x, new_y)) {
             return direction;
@@ -58,8 +58,8 @@ function mob_level1 (x, y, direction) {
         }
     } else if (temp <= 0.95) {
         direction = right (direction);
-        let new_x = x + directions[direction][0];
-        let new_y = y + directions[direction][1];
+        let new_x = x + DIRECTION_VALUES[direction][0];
+        let new_y = y + DIRECTION_VALUES[direction][1];
 
         if (map.empty (new_x, new_y)) {
             return direction;
@@ -72,8 +72,8 @@ function mob_level1 (x, y, direction) {
         }
     } else {
         direction = turn (direction);
-        let new_x = x + directions[direction][0];
-        let new_y = y + directions[direction][1];
+        let new_x = x + DIRECTION_VALUES[direction][0];
+        let new_y = y + DIRECTION_VALUES[direction][1];
 
         if (map.empty (new_x, new_y)) {
             return direction;
@@ -89,11 +89,11 @@ function mob_level1 (x, y, direction) {
 
 function mob_level2 (x, y) {
     let options = [];
-    for (let i = 0; i < 4; i++) {
-        let new_x = x + directions[i][0];
-        let new_y = y + directions[i][1];
+    for (const direction of DIRECTION_INDICES) {
+        let new_x = x + DIRECTION_VALUES[direction][0];
+        let new_y = y + DIRECTION_VALUES[direction][1];
         if (map.empty (new_x, new_y) && stink_matrix[new_x][new_y] < stink_matrix[x][y]) {
-            options.push (i);
+            options.push (direction);
         }
     }
 
@@ -141,8 +141,8 @@ function tryToMobMove (mob) {
         }
     }
 
-    let vx = directions[mob.getDirection ()][0];
-    let vy = directions[mob.getDirection ()][1];
+    let vx = DIRECTION_VALUES[mob.getDirection ()][0];
+    let vy = DIRECTION_VALUES[mob.getDirection ()][1];
 
     mob.move (vx * mob.v, vy * mob.v);
     return true;

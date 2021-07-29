@@ -1,12 +1,13 @@
 let pressedKey = []; //HashSet
 
-const KEY_UP = 0;
-const KEY_RIGHT = 1;
-const KEY_DOWN = 2;
-const KEY_LEFT = 3;
-const KEY_SHOOT = 4;
+const KEY_UP = UP;
+const KEY_RIGHT = RIGHT;
+const KEY_DOWN = DOWN;
+const KEY_LEFT = LEFT;
 
-const KEY_DIRECTION_KEYS = [KEY_UP, KEY_RIGHT, KEY_DOWN, KEY_LEFT];
+const MOVEMENT_KEYS = [KEY_UP, KEY_RIGHT, KEY_DOWN, KEY_LEFT];
+
+const KEY_SHOOT = 4;
 
 function registerEventListeners () {
     window.addEventListener ("keydown", doKeyDown, false);

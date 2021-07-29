@@ -1,8 +1,14 @@
-const directions = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+const UP = 0;
+const RIGHT = 1;
+const DOWN = 2;
+const LEFT = 3;
+
+const DIRECTION_INDICES = [UP, RIGHT, DOWN, LEFT];
+const DIRECTION_VALUES = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
 function getCoordsInDirection (kx, ky, x, y, direction) {
-    let vx = directions[direction][0];
-    let vy = directions[direction][1];
+    let vx = DIRECTION_VALUES[direction][0];
+    let vy = DIRECTION_VALUES[direction][1];
 
     let new_x;
     let new_y;

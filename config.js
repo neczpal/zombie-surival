@@ -42,6 +42,6 @@ const shooting_speed = 5;
 
 //DEV
 
-const show_stink_matrix = true;
+const show_stink_matrix = false;
 
 //#TODO Create a config menu where user can set these values - also randomize them
