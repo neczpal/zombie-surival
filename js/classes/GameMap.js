@@ -1,4 +1,4 @@
-function Map (w, h) {
+function GameMap (w, h) {
     this.tiles = [];
     this.width = w;
     this.height = h;
@@ -15,12 +15,25 @@ function Map (w, h) {
     for (let i = 0; i < this.width; i++) {
         for (let j = 0; j < this.height; j++) {
             //If no wall near
-            if (Math.floor (Math.random () * 100) < wall_rate && this.tiles[i][j] === 0
-                && i + 1 < this.width && this.tiles[i + 1][j] === 0
-                && i - 1 >= 0 && this.tiles[i - 1][j] === 0 && this.tiles[i][j] === 0
-                && j + 1 < this.height && this.tiles[i][j + 1] === 0 && j - 1 >= 0 && this.tiles[i][j - 1] === 0
-                && this.tiles[i + 1][j + 1] === 0 && this.tiles[i + 1][j - 1] === 0
-                && this.tiles[i - 1][j + 1] === 0 && this.tiles[i - 1][j - 1] === 0) {
+            if (Math.floor (Math.random () * 100) < wall_rate
+                // Bounds check
+                && i + 1 < this.width
+                && i - 1 >= 0
+                && j + 1 < this.height
+                && j - 1 >= 0
+                // Current check
+                && this.tiles[i][j] === 0
+                // Orthogonal check
+                && this.tiles[i + 1][j] === 0
+                && this.tiles[i - 1][j] === 0
+                && this.tiles[i][j + 1] === 0
+                && this.tiles[i][j - 1] === 0
+                // Diagonal check
+                && this.tiles[i + 1][j + 1] === 0
+                && this.tiles[i + 1][j - 1] === 0
+                && this.tiles[i - 1][j + 1] === 0
+                && this.tiles[i - 1][j - 1] === 0) {
+
                 let length = Math.floor (Math.random () * wall_max) + wall_min;
 
                 //Horizontal

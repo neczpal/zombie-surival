@@ -7,7 +7,7 @@ let lose = false;
 let spawn_rate;
 let mob_skill;//#TODO Make mobs level up faster as time goes on?
 
-let map;//Map
+let map;//GameMap
 let player;//Player p;
 let mobs; //List
 let bullets; //List
@@ -61,7 +61,7 @@ function newGame () {
         enableTroubles ();
     }
 
-    map = new Map (map_width, map_height);
+    map = new GameMap (map_width, map_height);
     map.set (map_width / 2, map_height / 2, 0);
     player = new Player (map_width / 2, map_height / 2);
 
